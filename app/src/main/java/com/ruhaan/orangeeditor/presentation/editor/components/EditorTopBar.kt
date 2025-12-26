@@ -2,6 +2,7 @@ package com.ruhaan.orangeeditor.presentation.editor.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -11,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.ruhaan.orangeeditor.R
 import com.ruhaan.orangeeditor.presentation.theme.Typography
 
@@ -18,7 +20,7 @@ import com.ruhaan.orangeeditor.presentation.theme.Typography
 @Preview(showBackground = true)
 fun EditorTopBar(modifier: Modifier = Modifier) {
   Row(
-      modifier = modifier,
+      modifier = modifier.padding(end = 15.dp, bottom = 5.dp),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically,
   ) {
@@ -31,7 +33,7 @@ fun EditorTopBar(modifier: Modifier = Modifier) {
     }
 
     Text(
-        text = "Untitled",
+        text = "Draft",
         modifier = Modifier.weight(weight = 3f),
         style = Typography.titleLarge.copy(fontWeight = FontWeight.Medium),
     )
@@ -56,7 +58,7 @@ fun EditorTopBar(modifier: Modifier = Modifier) {
         onClick = {
           // TODO : Add export functionality
         },
-        colors = ButtonDefaults.buttonColors().copy(containerColor = Color.White.copy(alpha = .8f)),
+        colors = ButtonDefaults.buttonColors().copy(containerColor = Color.White),
     ) {
       Text(text = "Export", style = Typography.titleSmall)
     }

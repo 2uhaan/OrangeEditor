@@ -8,9 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.ruhaan.orangeeditor.presentation.components.CanvasGrid
+import com.ruhaan.orangeeditor.presentation.home.components.CanvasGrid
 import com.ruhaan.orangeeditor.domain.model.CanvasFormats
-import com.ruhaan.orangeeditor.presentation.components.HomeHeader
+import com.ruhaan.orangeeditor.presentation.home.components.HomeHeader
 import com.ruhaan.orangeeditor.presentation.theme.BackgroundLight
 
 
