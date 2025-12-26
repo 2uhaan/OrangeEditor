@@ -1,5 +1,6 @@
 package com.ruhaan.orangeeditor.presentation.home.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -16,14 +17,16 @@ import com.ruhaan.orangeeditor.presentation.theme.TextPrimary
 
 @Composable
 fun CanvasFormatCard(
+    modifier: Modifier = Modifier,
     canvasFormat: CanvasFormat,  // Data to display
-    modifier: Modifier = Modifier
+    onClick: () -> Unit  // Click callback
 ) {
 
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .aspectRatio(0.85f),  // Card height relative to width
+            .aspectRatio(0.85f)
+            .clickable { onClick() },  // Make card clickable
         colors = CardDefaults.cardColors(
             containerColor = CardBackground
         ),
