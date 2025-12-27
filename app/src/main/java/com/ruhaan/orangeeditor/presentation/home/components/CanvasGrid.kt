@@ -12,8 +12,9 @@ import com.ruhaan.orangeeditor.domain.model.CanvasFormat
 
 @Composable
 fun CanvasGrid(
-    canvasFormats: List<CanvasFormat>,  // List of all canvas options
     modifier: Modifier = Modifier,
+    canvasFormats: List<CanvasFormat>,  // List of all canvas options
+    onFormatClick: (CanvasFormat) -> Unit,  // Click callback parameter
     headerContent: @Composable () -> Unit = {}  // Accept header content
 ) {
     // scrollable grid layout (for adding more later - if any)
@@ -34,7 +35,10 @@ fun CanvasGrid(
         }
         // Loop through each canvas format and create a card
         items(canvasFormats) { format ->
-            CanvasFormatCard(canvasFormat = format)
+            CanvasFormatCard(
+                canvasFormat = format,
+                onClick = { onFormatClick(format) }  // ✨ NEW: Pass click handler
+            )
         }
     }
 }

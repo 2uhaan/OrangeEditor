@@ -11,14 +11,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ruhaan.orangeeditor.R
 import com.ruhaan.orangeeditor.presentation.theme.Typography
 
 @Composable
-@Preview(showBackground = true)
-fun EditorTopBar(modifier: Modifier = Modifier) {
+fun EditorTopBar(
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit,
+) {
   Row(
       modifier = modifier.padding(end = 15.dp, bottom = 5.dp),
       horizontalArrangement = Arrangement.SpaceBetween,
@@ -29,7 +30,7 @@ fun EditorTopBar(modifier: Modifier = Modifier) {
         iconId = R.drawable.ic_back_arrow,
         contentDescription = "go back",
     ) {
-      // TODO: Add back functionality
+        onBackClick()
     }
 
     Text(
