@@ -30,7 +30,7 @@ fun EditorTopBar(
         iconId = R.drawable.ic_back_arrow,
         contentDescription = "go back",
     ) {
-        onBackClick()
+      onBackClick()
     }
 
     Text(

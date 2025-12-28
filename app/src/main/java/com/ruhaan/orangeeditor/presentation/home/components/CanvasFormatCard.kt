@@ -18,43 +18,29 @@ import com.ruhaan.orangeeditor.presentation.theme.TextPrimary
 @Composable
 fun CanvasFormatCard(
     modifier: Modifier = Modifier,
-    canvasFormat: CanvasFormat,  // Data to display
-    onClick: () -> Unit  // Click callback
+    canvasFormat: CanvasFormat,
+    onClick: () -> Unit,
 ) {
-
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .aspectRatio(0.85f)
-            .clickable { onClick() },  // Make card clickable
-        colors = CardDefaults.cardColors(
-            containerColor = CardBackground
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp
-        )
+  Card(
+      modifier = modifier.fillMaxWidth().aspectRatio(0.85f).clickable { onClick() },
+      colors = CardDefaults.cardColors(containerColor = CardBackground),
+      elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+  ) {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            // The orange icons are used here
-            AspectRatioPreview(
-                aspectRatio = canvasFormat.aspectRatio
-            )
+      AspectRatioPreview(aspectRatio = canvasFormat.aspectRatio)
 
-            Spacer(modifier = Modifier.height(12.dp))
+      Spacer(modifier = Modifier.height(12.dp))
 
-            // screen size - written below the icons (Story or Post...)
-            Text(
-                text = canvasFormat.title,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = TextPrimary
-            )
-        }
+      Text(
+          text = canvasFormat.title,
+          fontSize = 18.sp,
+          fontWeight = FontWeight.SemiBold,
+          color = TextPrimary,
+      )
     }
+  }
 }

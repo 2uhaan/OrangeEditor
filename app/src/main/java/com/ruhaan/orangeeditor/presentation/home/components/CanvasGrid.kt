@@ -13,32 +13,25 @@ import com.ruhaan.orangeeditor.domain.model.CanvasFormat
 @Composable
 fun CanvasGrid(
     modifier: Modifier = Modifier,
-    canvasFormats: List<CanvasFormat>,  // List of all canvas options
-    onFormatClick: (CanvasFormat) -> Unit,  // Click callback parameter
-    headerContent: @Composable () -> Unit = {}  // Accept header content
+    canvasFormats: List<CanvasFormat>,
+    onFormatClick: (CanvasFormat) -> Unit,
+    headerContent: @Composable () -> Unit = {},
 ) {
-    // scrollable grid layout (for adding more later - if any)
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp),  // Side margins
-        horizontalArrangement = Arrangement.spacedBy(16.dp),  // Space between columns
-        verticalArrangement = Arrangement.spacedBy(16.dp),  // Space between rows
-        contentPadding = PaddingValues(vertical = 16.dp)  // Top aur bottom ke padding
-    ) {
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            Column {
-                Spacer(modifier = Modifier.height(20.dp))
-                headerContent()
-            }
-        }
-        // Loop through each canvas format and create a card
-        items(canvasFormats) { format ->
-            CanvasFormatCard(
-                canvasFormat = format,
-                onClick = { onFormatClick(format) }  // ✨ NEW: Pass click handler
-            )
-        }
+  LazyVerticalGrid(
+      columns = GridCells.Fixed(count = 2),
+      modifier = modifier.fillMaxWidth().padding(horizontal = 20.dp),
+      horizontalArrangement = Arrangement.spacedBy(16.dp),
+      verticalArrangement = Arrangement.spacedBy(16.dp),
+      contentPadding = PaddingValues(vertical = 16.dp),
+  ) {
+    item(span = { GridItemSpan(currentLineSpan = maxLineSpan) }) {
+      Column {
+        Spacer(modifier = Modifier.height(20.dp))
+        headerContent()
+      }
     }
+    items(canvasFormats) { format ->
+      CanvasFormatCard(canvasFormat = format, onClick = { onFormatClick(format) })
+    }
+  }
 }
