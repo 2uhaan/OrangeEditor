@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ruhaan.orangeeditor.domain.model.CanvasFormat
+import com.ruhaan.orangeeditor.domain.CanvasFormat
 import com.ruhaan.orangeeditor.presentation.editor.components.CanvasArea
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorBottomBar
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorTopBar

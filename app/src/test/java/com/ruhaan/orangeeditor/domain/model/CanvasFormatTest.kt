@@ -1,5 +1,6 @@
 package com.ruhaan.orangeeditor.domain.model
 
+import com.ruhaan.orangeeditor.domain.CanvasFormat
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -8,7 +9,7 @@ class CanvasFormatTest {
   @Test
   fun `canvasFormats list contains exactly 4 formats`() {
     // Given
-    val formats = CanvasFormat.allFormats
+    val formats = CanvasFormat.entries
 
     // Then
     assertEquals(4, formats.size)
@@ -17,7 +18,7 @@ class CanvasFormatTest {
   @Test
   fun `canvasFormats contains Story format with correct properties`() {
     // Given
-    val storyFormat = CanvasFormat.allFormats.find { it.title == "Story" }
+    val storyFormat = CanvasFormat.entries.find { it.title == "Story" }
 
     // Then
     assertNotNull(storyFormat)
@@ -28,7 +29,7 @@ class CanvasFormatTest {
   @Test
   fun `canvasFormats contains Post format with correct properties`() {
     // Given
-    val postFormat = CanvasFormat.allFormats.find { it.title == "Post" }
+    val postFormat = CanvasFormat.entries.find { it.title == "Post" }
 
     // Then
     assertNotNull(postFormat)
@@ -39,7 +40,7 @@ class CanvasFormatTest {
   @Test
   fun `canvasFormats contains Portrait format with correct properties`() {
     // Given
-    val portraitFormat = CanvasFormat.allFormats.find { it.title == "Portrait" }
+    val portraitFormat = CanvasFormat.entries.find { it.title == "Portrait" }
 
     // Then
     assertNotNull(portraitFormat)
@@ -50,7 +51,7 @@ class CanvasFormatTest {
   @Test
   fun `canvasFormats contains Thumbnail format with correct properties`() {
     // Given
-    val thumbnailFormat = CanvasFormat.allFormats.find { it.title == "Thumbnail" }
+    val thumbnailFormat = CanvasFormat.entries.find { it.title == "Thumbnail" }
 
     // Then
     assertNotNull(thumbnailFormat)
@@ -61,7 +62,7 @@ class CanvasFormatTest {
   @Test
   fun `all formats have unique titles`() {
     // Given
-    val formats = CanvasFormat.allFormats
+    val formats = CanvasFormat.entries
     val titles = formats.map { it.title }
 
     // Then

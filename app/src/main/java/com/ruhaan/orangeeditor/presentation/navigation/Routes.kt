@@ -1,6 +1,6 @@
 package com.ruhaan.orangeeditor.presentation.navigation
 
-import com.ruhaan.orangeeditor.domain.model.CanvasFormat
+import com.ruhaan.orangeeditor.domain.CanvasFormat
 
 sealed class Route(val route: String) {
 
