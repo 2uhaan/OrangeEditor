@@ -16,20 +16,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.ruhaan.orangeeditor.domain.model.format.CanvasFormat
 import com.ruhaan.orangeeditor.presentation.editor.components.CanvasArea
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorBottomBar
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorTopBar
 import com.ruhaan.orangeeditor.presentation.theme.CanvasOrange
 
 @Composable
-@Preview(showBackground = true, showSystemUi = true)
-fun EditorScreen(modifier: Modifier = Modifier) {
+fun EditorScreen(
+    modifier: Modifier = Modifier,
+    canvasFormat: CanvasFormat,
+    navController: NavHostController,
+) {
+
   Scaffold(
       topBar = {
         Box(modifier = Modifier.background(color = CanvasOrange)) {
-          EditorTopBar(modifier = Modifier.fillMaxWidth().statusBarsPadding())
+          EditorTopBar(
+              modifier = Modifier.fillMaxWidth().statusBarsPadding(),
+              onBackClick = { navController.popBackStack() },
+          )
         }
       },
       bottomBar = {
@@ -41,12 +49,13 @@ fun EditorScreen(modifier: Modifier = Modifier) {
           )
         }
       },
-  ) { _ ->
+  ) { paddingValues ->
     Box(
-        modifier = modifier.fillMaxSize().background(color = Color(0xFFfaf9f6)),
+        modifier =
+            modifier.fillMaxSize().padding(paddingValues).background(color = Color(0xFFfaf9f6)),
         contentAlignment = Alignment.Center,
     ) {
-      CanvasArea()
+      CanvasArea(canvasFormat = canvasFormat)
     }
   }
 }
