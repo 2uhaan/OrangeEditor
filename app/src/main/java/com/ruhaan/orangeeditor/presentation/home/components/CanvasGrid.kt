@@ -7,7 +7,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.ruhaan.orangeeditor.domain.CanvasFormat
+import com.ruhaan.orangeeditor.domain.model.format.CanvasFormat
 
 @Composable
 fun CanvasGrid(

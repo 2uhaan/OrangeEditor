@@ -14,7 +14,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.ruhaan.orangeeditor.domain.CanvasFormat
+import com.ruhaan.orangeeditor.domain.model.format.CanvasFormat
 import com.ruhaan.orangeeditor.presentation.editor.EditorScreen
 import com.ruhaan.orangeeditor.presentation.home.HomeScreen
 import kotlinx.coroutines.delay

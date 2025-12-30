@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ruhaan.orangeeditor.domain.CanvasFormat
+import com.ruhaan.orangeeditor.domain.model.format.CanvasFormat
 import com.ruhaan.orangeeditor.presentation.theme.CardBackground
 import com.ruhaan.orangeeditor.presentation.theme.TextPrimary
 
