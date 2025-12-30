@@ -1,4 +1,4 @@
-package com.ruhaan.orangeeditor.domain
+package com.ruhaan.orangeeditor.domain.model.format
 
 enum class CanvasFormat(
     val title: String,
