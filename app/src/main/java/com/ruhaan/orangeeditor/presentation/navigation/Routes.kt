@@ -15,4 +15,6 @@ sealed class Route(val route: String) {
       return "editor/${format.name}" // Uses enum's name
     }
   }
+
+  data object CropScreen : Route("crop")
 }
