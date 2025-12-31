@@ -1,4 +1,4 @@
-package com.ruhaan.orangeeditor.presentation.editor.components
+package com.ruhaan.orangeeditor.presentation.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
