@@ -9,15 +9,30 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.ruhaan.orangeeditor.domain.model.format.CanvasFormat
+import com.ruhaan.orangeeditor.domain.model.layer.EditorState
+import com.ruhaan.orangeeditor.util.EditorRenderer
 import kotlin.math.min
 
 @Composable
-fun CanvasArea(canvasFormat: CanvasFormat, modifier: Modifier = Modifier) {
+fun EditorCanvas(
+    modifier: Modifier = Modifier,
+    canvasFormat: CanvasFormat,
+    state: EditorState,
+    onCanvasSize: (IntSize) -> Unit,
+) {
+
+  val renderer = remember { EditorRenderer() }
+
   BoxWithConstraints(
       modifier = modifier.fillMaxSize().padding(16.dp),
       contentAlignment = Alignment.Center,
@@ -46,12 +61,15 @@ fun CanvasArea(canvasFormat: CanvasFormat, modifier: Modifier = Modifier) {
     Box(
         modifier =
             Modifier.border(width = 2.dp, color = Color.Gray.copy(alpha = 0.4f))
-                .size(width = canvasWidth, height = canvasHeight),
+                .size(width = canvasWidth, height = canvasHeight)
+                .onSizeChanged { onCanvasSize(it) },
         contentAlignment = Alignment.Center,
     ) {
       Surface(shadowElevation = 2.dp, color = Color.White) {
         Canvas(modifier = Modifier.size(width = canvasWidth, height = canvasHeight)) {
-          // Drawing operations will go here later
+          drawIntoCanvas { composeCanvas ->
+            renderer.draw(composeCanvas.nativeCanvas, state.layers)
+          }
         }
       }
     }
