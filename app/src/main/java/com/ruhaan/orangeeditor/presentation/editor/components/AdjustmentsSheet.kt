@@ -49,12 +49,19 @@ fun AdjustmentsSheet(
 
   ModalBottomSheet(modifier = modifier, onDismissRequest = onDismissRequest) {
     Column(modifier = modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+      Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically,
+      ) {
         Text(
             text = "Adjustments",
             style = Typography.headlineSmall,
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
           OutlinedButton(
               onClick = {
                 saturation.value = NeutralAdjustments.saturation
