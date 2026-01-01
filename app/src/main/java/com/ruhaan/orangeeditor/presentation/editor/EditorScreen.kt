@@ -22,6 +22,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -46,6 +48,7 @@ fun EditorScreen(
 ) {
   // ViewModel states
   val state by viewModel.state.collectAsState()
+  var currentSelectedTextLayer by remember { mutableStateOf(viewModel.getSelectedTextLayer()) }
   var currentSelectedImageLayer by remember { mutableStateOf(viewModel.getSelectedImagerLayer()) }
 
   // Local states
@@ -54,21 +57,39 @@ fun EditorScreen(
   var showImageFilters by remember { mutableStateOf(false) }
   var showAdjustmentsSheet by remember { mutableStateOf(false) }
 
-  LaunchedEffect(state) { currentSelectedImageLayer = viewModel.getSelectedImagerLayer() }
+  LaunchedEffect(state) {
+    currentSelectedTextLayer = viewModel.getSelectedTextLayer()
+    currentSelectedImageLayer = viewModel.getSelectedImagerLayer()
+  }
 
   if (showAddTextSheet)
       AddTextSheet(
           onDismissRequest = { showAddTextSheet = false },
-          onTextAdd = { text, fontSize, fontColor, fontWeight, fontStyle ->
-            viewModel.addTextLayer(
-                text = text,
-                fontSizeInPx = fontSize,
-                color = fontColor,
-                fontWeight = fontWeight,
-                fontStyle = fontStyle,
-                canvasWidthInPx = canvasSize.width.toFloat(),
-                canvasHeightInPx = canvasSize.height.toFloat(),
-            )
+          isNew = currentSelectedTextLayer == null,
+          prevInputText = currentSelectedTextLayer?.text ?: "",
+          prevFontWeight = currentSelectedTextLayer?.fontWeight ?: FontWeight.Normal,
+          prevFontStyle = currentSelectedTextLayer?.fontStyle ?: FontStyle.Normal,
+          prevFontSize = currentSelectedTextLayer?.fontSizeInPx ?: 80,
+          prevColor = currentSelectedTextLayer?.color ?: Color.Black,
+          onTextAdd = { isNewText, text, fontSize, fontColor, fontWeight, fontStyle ->
+            if (isNewText || currentSelectedTextLayer == null)
+                viewModel.addTextLayer(
+                    text = text,
+                    fontSizeInPx = fontSize,
+                    color = fontColor,
+                    fontWeight = fontWeight,
+                    fontStyle = fontStyle,
+                    canvasWidthInPx = canvasSize.width.toFloat(),
+                    canvasHeightInPx = canvasSize.height.toFloat(),
+                )
+            else
+                viewModel.updateSelectedTextLayer(
+                    text = text,
+                    fontSizeInPx = fontSize,
+                    fontColor = fontColor,
+                    fontWeight = fontWeight,
+                    fontStyle = fontStyle,
+                )
           },
       )
 

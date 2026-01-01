@@ -1,6 +1,7 @@
 package com.ruhaan.orangeeditor.presentation.editor
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -101,19 +102,6 @@ class EditorViewModel : ViewModel() {
     _state.update { state -> state.copy(selectedLayerId = id) }
   }
 
-  fun updateLayer(updatedLayer: Layer) {
-    _state.update { state ->
-      state.copy(
-          layers =
-              state.layers.map { layer -> if (layer.id == updatedLayer.id) updatedLayer else layer }
-      )
-    }
-  }
-
-  fun removeLayer(id: String) {
-    _state.update { state -> state.copy(layers = state.layers.filterNot { it.id == id }) }
-  }
-
   fun getSelectedLayer(): Layer? {
     return _state.value.layers.firstOrNull { it.id == _state.value.selectedLayerId }
   }
@@ -122,6 +110,22 @@ class EditorViewModel : ViewModel() {
     val currentSelectedLayer = getSelectedLayer()
     if (currentSelectedLayer is ImageLayer) return currentSelectedLayer
     return null
+  }
+
+  fun getSelectedTextLayer(): TextLayer? {
+    val currentSelectedLayer = getSelectedLayer()
+    if (currentSelectedLayer is TextLayer) return currentSelectedLayer
+    return null
+  }
+
+  fun updateLayer(updatedLayer: Layer) {
+    _state.update { state ->
+      state.copy(
+          layers =
+              state.layers.map { layer -> if (layer.id == updatedLayer.id) updatedLayer else layer }
+      )
+    }
+    Log.i("LOG", "${_state.value.layers}")
   }
 
   fun updateBitmapOfSelectedImageLayer(updatedBitmap: Bitmap) {
@@ -140,5 +144,30 @@ class EditorViewModel : ViewModel() {
     val selectedLayer = getSelectedLayer()
     val selectedImageLayer = selectedLayer as? ImageLayer
     selectedImageLayer?.let { updateLayer(updatedLayer = it.copy(adjustments = adjustments)) }
+  }
+
+  fun updateSelectedTextLayer(
+      text: String,
+      fontSizeInPx: Int,
+      fontColor: Color,
+      fontWeight: FontWeight,
+      fontStyle: FontStyle,
+  ) {
+    val selectedTextLayer = getSelectedTextLayer() ?: return
+
+    val updatedLayer =
+        selectedTextLayer.copy(
+            text = text,
+            fontSizeInPx = fontSizeInPx,
+            color = fontColor,
+            fontWeight = fontWeight,
+            fontStyle = fontStyle,
+        )
+
+    updateLayer(updatedLayer)
+  }
+
+  fun removeLayer(id: String) {
+    _state.update { state -> state.copy(layers = state.layers.filterNot { it.id == id }) }
   }
 }
