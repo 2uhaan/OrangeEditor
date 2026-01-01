@@ -25,9 +25,11 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ruhaan.orangeeditor.domain.model.format.CanvasFormat
+import com.ruhaan.orangeeditor.presentation.editor.components.AddTextSheet
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorBottomBar
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorCanvas
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorTopBar
+import com.ruhaan.orangeeditor.presentation.editor.components.FilterRow
 import com.ruhaan.orangeeditor.presentation.editor.components.SelectedLayerGestureLayer
 import com.ruhaan.orangeeditor.presentation.navigation.Route
 import com.ruhaan.orangeeditor.presentation.theme.CanvasOrange
@@ -44,6 +46,8 @@ fun EditorScreen(
 
   // Local states
   var canvasSize by remember { mutableStateOf(IntSize.Zero) }
+  var showAddTextSheet by remember { mutableStateOf(false) }
+  var showImageFilters by remember { mutableStateOf(false) }
 
   Scaffold(
       topBar = {
@@ -56,6 +60,14 @@ fun EditorScreen(
       },
       bottomBar = {
         Column(modifier = Modifier.background(Color.White)) {
+          if (showImageFilters) {
+            FilterRow(
+                modifier = Modifier.fillMaxWidth().padding(4.dp),
+                onClick = { imageFilter ->
+                  viewModel.updateImageFilterOfSelectedImagerLayer(imageFilter)
+                },
+            )
+          }
           HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 2.dp)
           Spacer(modifier = Modifier.height(height = 4.dp))
           EditorBottomBar(
@@ -67,22 +79,29 @@ fun EditorScreen(
                     canvasHeightInPx = canvasSize.height.toFloat(),
                 )
               },
-              onTextAdd = { text, fontSize, fontColor, fontWeight, fontStyle ->
-                viewModel.addTextLayer(
-                    text = text,
-                    fontSizeInPx = fontSize,
-                    color = fontColor,
-                    fontWeight = fontWeight,
-                    fontStyle = fontStyle,
-                    canvasWidthInPx = canvasSize.width.toFloat(),
-                    canvasHeightInPx = canvasSize.height.toFloat(),
-                )
-              },
+              onTextClick = { showAddTextSheet = true },
+              onFilterClick = { showImageFilters = !showImageFilters },
               onCropClick = { navController.navigate(Route.CropScreen.route) },
           )
         }
       },
   ) { innerPadding ->
+    if (showAddTextSheet)
+        AddTextSheet(
+            onDismissRequest = { showAddTextSheet = false },
+            onTextAdd = { text, fontSize, fontColor, fontWeight, fontStyle ->
+              viewModel.addTextLayer(
+                  text = text,
+                  fontSizeInPx = fontSize,
+                  color = fontColor,
+                  fontWeight = fontWeight,
+                  fontStyle = fontStyle,
+                  canvasWidthInPx = canvasSize.width.toFloat(),
+                  canvasHeightInPx = canvasSize.height.toFloat(),
+              )
+            },
+        )
+
     Box(
         modifier =
             modifier.fillMaxSize().padding(innerPadding).background(color = Color(0xFFfaf9f6)),

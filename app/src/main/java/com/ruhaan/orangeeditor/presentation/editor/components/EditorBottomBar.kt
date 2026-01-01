@@ -11,16 +11,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ruhaan.orangeeditor.R
 import com.ruhaan.orangeeditor.presentation.components.LargeIconButton
@@ -29,20 +22,12 @@ import com.ruhaan.orangeeditor.presentation.components.LargeIconButton
 fun EditorBottomBar(
     modifier: Modifier = Modifier,
     onImageImportClick: (Bitmap) -> Unit = {},
-    onTextAdd:
-        (
-            text: String,
-            fontSize: Int,
-            fontColor: Color,
-            fontWeight: FontWeight,
-            fontStyle: FontStyle,
-        ) -> Unit,
-    onFilterClick: () -> Unit = {},
+    onTextClick: () -> Unit,
+    onFilterClick: () -> Unit,
     onAdjustmentsClick: () -> Unit = {},
     onCropClick: () -> Unit = {},
 ) {
   val context = LocalContext.current
-  var showAddTextSheet by remember { mutableStateOf(false) }
 
   val launcher =
       rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia()) { uri
@@ -80,7 +65,7 @@ fun EditorBottomBar(
           contentDescription = "text",
           label = "Text",
       ) {
-        showAddTextSheet = true
+        onTextClick()
       }
     }
 
@@ -91,7 +76,7 @@ fun EditorBottomBar(
           contentDescription = "filters",
           label = "Filter",
       ) {
-        // TODO: Add filter functionality
+        onFilterClick()
       }
     }
 
@@ -116,9 +101,6 @@ fun EditorBottomBar(
       )
     }
   }
-
-  if (showAddTextSheet)
-      AddTextSheet(onDismissRequest = { showAddTextSheet = false }, onTextAdd = onTextAdd)
 }
 
 fun loadBitmapFromUri(context: Context, uri: Uri): Bitmap? {
