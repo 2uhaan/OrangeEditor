@@ -67,9 +67,13 @@ fun EditorScreen(
                     canvasHeightInPx = canvasSize.height.toFloat(),
                 )
               },
-              onTextClick = { text ->
+              onTextAdd = { text, fontSize, fontColor, fontWeight, fontStyle ->
                 viewModel.addTextLayer(
                     text = text,
+                    fontSizeInPx = fontSize,
+                    color = fontColor,
+                    fontWeight = fontWeight,
+                    fontStyle = fontStyle,
                     canvasWidthInPx = canvasSize.width.toFloat(),
                     canvasHeightInPx = canvasSize.height.toFloat(),
                 )
