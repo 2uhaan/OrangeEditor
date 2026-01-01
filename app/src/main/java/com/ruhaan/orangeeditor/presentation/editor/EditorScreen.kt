@@ -49,6 +49,22 @@ fun EditorScreen(
   var showAddTextSheet by remember { mutableStateOf(false) }
   var showImageFilters by remember { mutableStateOf(false) }
 
+  if (showAddTextSheet)
+      AddTextSheet(
+          onDismissRequest = { showAddTextSheet = false },
+          onTextAdd = { text, fontSize, fontColor, fontWeight, fontStyle ->
+            viewModel.addTextLayer(
+                text = text,
+                fontSizeInPx = fontSize,
+                color = fontColor,
+                fontWeight = fontWeight,
+                fontStyle = fontStyle,
+                canvasWidthInPx = canvasSize.width.toFloat(),
+                canvasHeightInPx = canvasSize.height.toFloat(),
+            )
+          },
+      )
+
   Scaffold(
       topBar = {
         Box(modifier = Modifier.background(color = CanvasOrange)) {
@@ -86,22 +102,6 @@ fun EditorScreen(
         }
       },
   ) { innerPadding ->
-    if (showAddTextSheet)
-        AddTextSheet(
-            onDismissRequest = { showAddTextSheet = false },
-            onTextAdd = { text, fontSize, fontColor, fontWeight, fontStyle ->
-              viewModel.addTextLayer(
-                  text = text,
-                  fontSizeInPx = fontSize,
-                  color = fontColor,
-                  fontWeight = fontWeight,
-                  fontStyle = fontStyle,
-                  canvasWidthInPx = canvasSize.width.toFloat(),
-                  canvasHeightInPx = canvasSize.height.toFloat(),
-              )
-            },
-        )
-
     Box(
         modifier =
             modifier.fillMaxSize().padding(innerPadding).background(color = Color(0xFFfaf9f6)),
