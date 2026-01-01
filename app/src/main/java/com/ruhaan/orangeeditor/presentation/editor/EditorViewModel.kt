@@ -10,6 +10,7 @@ import com.ruhaan.orangeeditor.domain.model.layer.EditorState
 import com.ruhaan.orangeeditor.domain.model.layer.ImageFilter
 import com.ruhaan.orangeeditor.domain.model.layer.ImageLayer
 import com.ruhaan.orangeeditor.domain.model.layer.Layer
+import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustments
 import com.ruhaan.orangeeditor.domain.model.layer.TextLayer
 import com.ruhaan.orangeeditor.domain.model.layer.Transform
 import java.util.UUID
@@ -52,7 +53,7 @@ class EditorViewModel : ViewModel() {
             id = UUID.randomUUID().toString(),
             bitmap = bitmap,
             imageFilter = imageFilter,
-            adjustments = Adjustments(hue = 100f),
+            adjustments = NeutralAdjustments,
             transform = Transform(x = x, y = y, scale = scale, rotation = 0f),
             zIndex = (_state.value.layers.maxOfOrNull { it.zIndex } ?: 0) + 1,
             originalWidth = bitmap.width,
@@ -117,6 +118,12 @@ class EditorViewModel : ViewModel() {
     return _state.value.layers.firstOrNull { it.id == _state.value.selectedLayerId }
   }
 
+  fun getSelectedImagerLayer(): ImageLayer? {
+    val currentSelectedLayer = getSelectedLayer()
+    if (currentSelectedLayer is ImageLayer) return currentSelectedLayer
+    return null
+  }
+
   fun updateBitmapOfSelectedImageLayer(updatedBitmap: Bitmap) {
     val selectedLayer = getSelectedLayer()
     val selectedImageLayer = selectedLayer as? ImageLayer
@@ -127,5 +134,11 @@ class EditorViewModel : ViewModel() {
     val selectedLayer = getSelectedLayer()
     val selectedImageLayer = selectedLayer as? ImageLayer
     selectedImageLayer?.let { updateLayer(updatedLayer = it.copy(imageFilter = imageFilter)) }
+  }
+
+  fun updateAdjustmentsOfSelectedImageLayer(adjustments: Adjustments) {
+    val selectedLayer = getSelectedLayer()
+    val selectedImageLayer = selectedLayer as? ImageLayer
+    selectedImageLayer?.let { updateLayer(updatedLayer = it.copy(adjustments = adjustments)) }
   }
 }
