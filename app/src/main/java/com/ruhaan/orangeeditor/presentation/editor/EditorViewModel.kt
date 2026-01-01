@@ -117,9 +117,15 @@ class EditorViewModel : ViewModel() {
     return _state.value.layers.firstOrNull { it.id == _state.value.selectedLayerId }
   }
 
-  fun updateBitmapOfImageSelectedLayer(updatedBitmap: Bitmap) {
+  fun updateBitmapOfSelectedImageLayer(updatedBitmap: Bitmap) {
     val selectedLayer = getSelectedLayer()
     val selectedImageLayer = selectedLayer as? ImageLayer
     selectedImageLayer?.let { updateLayer(updatedLayer = it.copy(bitmap = updatedBitmap)) }
+  }
+
+  fun updateImageFilterOfSelectedImagerLayer(imageFilter: ImageFilter) {
+    val selectedLayer = getSelectedLayer()
+    val selectedImageLayer = selectedLayer as? ImageLayer
+    selectedImageLayer?.let { updateLayer(updatedLayer = it.copy(imageFilter = imageFilter)) }
   }
 }

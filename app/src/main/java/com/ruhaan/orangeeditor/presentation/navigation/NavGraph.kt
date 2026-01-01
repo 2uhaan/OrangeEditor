@@ -74,7 +74,7 @@ fun NavGraph(
     composable(route = Route.CropScreen.route) {
       CropScreen(
           selectedLayer = viewmodel.getSelectedLayer(),
-          onSave = viewmodel::updateBitmapOfImageSelectedLayer,
+          onSave = viewmodel::updateBitmapOfSelectedImageLayer,
           onNavigateBack = navController::popBackStack,
       )
     }
