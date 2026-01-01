@@ -2,7 +2,8 @@ package com.ruhaan.orangeeditor.presentation.editor
 
 import android.graphics.Bitmap
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.ViewModel
 import com.ruhaan.orangeeditor.domain.model.layer.Adjustments
 import com.ruhaan.orangeeditor.domain.model.layer.EditorState
@@ -63,11 +64,12 @@ class EditorViewModel : ViewModel() {
 
   fun addTextLayer(
       text: String,
+      color: Color,
+      fontSizeInPx: Int,
+      fontWeight: FontWeight,
+      fontStyle: FontStyle,
       canvasWidthInPx: Float,
       canvasHeightInPx: Float,
-      color: Color = Color.Black,
-      fontSizeInPx: Float = 80f,
-      fontFamily: FontFamily = FontFamily.Default,
   ) {
     val x = canvasWidthInPx / 2f
     val y = canvasHeightInPx / 2f
@@ -78,7 +80,8 @@ class EditorViewModel : ViewModel() {
             text = text,
             color = color,
             fontSizeInPx = fontSizeInPx,
-            fontFamily = fontFamily,
+            fontWeight = fontWeight,
+            fontStyle = fontStyle,
             transform =
                 Transform(
                     x = x,

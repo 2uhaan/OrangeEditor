@@ -75,7 +75,7 @@ fun NavGraph(
       CropScreen(
           selectedLayer = viewmodel.getSelectedLayer(),
           onSave = viewmodel::updateBitmapOfImageSelectedLayer,
-          onNavigateBack = { navController.popBackStack() },
+          onNavigateBack = navController::popBackStack,
       )
     }
   }
