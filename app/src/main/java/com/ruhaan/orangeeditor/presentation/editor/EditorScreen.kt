@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,7 +26,9 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ruhaan.orangeeditor.domain.model.format.CanvasFormat
+import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustments
 import com.ruhaan.orangeeditor.presentation.editor.components.AddTextSheet
+import com.ruhaan.orangeeditor.presentation.editor.components.AdjustmentsSheet
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorBottomBar
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorCanvas
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorTopBar
@@ -43,11 +46,15 @@ fun EditorScreen(
 ) {
   // ViewModel states
   val state by viewModel.state.collectAsState()
+  var currentSelectedImageLayer by remember { mutableStateOf(viewModel.getSelectedImagerLayer()) }
 
   // Local states
   var canvasSize by remember { mutableStateOf(IntSize.Zero) }
   var showAddTextSheet by remember { mutableStateOf(false) }
   var showImageFilters by remember { mutableStateOf(false) }
+  var showAdjustmentsSheet by remember { mutableStateOf(false) }
+
+  LaunchedEffect(state) { currentSelectedImageLayer = viewModel.getSelectedImagerLayer() }
 
   if (showAddTextSheet)
       AddTextSheet(
@@ -64,6 +71,14 @@ fun EditorScreen(
             )
           },
       )
+
+  if (showAdjustmentsSheet) {
+    AdjustmentsSheet(
+        onDismissRequest = { showAdjustmentsSheet = false },
+        adjustments = currentSelectedImageLayer?.adjustments ?: NeutralAdjustments,
+        onAdjustmentsConfirm = viewModel::updateAdjustmentsOfSelectedImageLayer,
+    )
+  }
 
   Scaffold(
       topBar = {
@@ -97,6 +112,7 @@ fun EditorScreen(
               },
               onTextClick = { showAddTextSheet = true },
               onFilterClick = { showImageFilters = !showImageFilters },
+              onAdjustmentsClick = { showAdjustmentsSheet = true },
               onCropClick = { navController.navigate(Route.CropScreen.route) },
           )
         }

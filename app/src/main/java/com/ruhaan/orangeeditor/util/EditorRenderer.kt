@@ -8,10 +8,10 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.core.graphics.withSave
-import com.ruhaan.orangeeditor.domain.model.layer.Adjustments
 import com.ruhaan.orangeeditor.domain.model.layer.ImageFilter
 import com.ruhaan.orangeeditor.domain.model.layer.ImageLayer
 import com.ruhaan.orangeeditor.domain.model.layer.Layer
+import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustments
 import com.ruhaan.orangeeditor.domain.model.layer.TextLayer
 import com.ruhaan.orangeeditor.domain.model.layer.toColorMatrix
 
@@ -38,7 +38,7 @@ class EditorRenderer {
 
       val filter = layer.imageFilter
 
-      val isApplyCustomAdjustments = layer.adjustments == Adjustments()
+      val isApplyCustomAdjustments = layer.adjustments != NeutralAdjustments
 
       val paint =
           Paint().apply {
@@ -49,11 +49,13 @@ class EditorRenderer {
                 )
           }
 
+      val shouldApplyPaint = isApplyCustomAdjustments || filter != ImageFilter.NO_FILTER
+
       drawBitmap(
           layer.bitmap,
           -layer.bitmap.width / 2f,
           -layer.bitmap.height / 2f,
-          if (filter == ImageFilter.NO_FILTER) null else paint,
+          if (shouldApplyPaint) paint else null,
       )
     }
   }

@@ -4,27 +4,37 @@ import android.graphics.ColorMatrix
 import kotlin.math.pow
 
 /**
- *
  * All values are CLAMPED internally to safe ranges.
  *
  * Ranges:
- *  - Saturation:   0f   .. 2f     (1f = normal)
- *  - Brightness:  -100 .. +100    (0 = normal)
- *  - Contrast:    0.5f .. 1.5f    (1f = normal)
- *  - Exposure:    -1f  .. +1f     (0 = normal)
- *  - Temperature: -100 .. +100    (0 = neutral)
- *  - Tint:        -100 .. +100    (0 = neutral)
- *  - Hue:         -180 .. +180    (0 = normal)
+ * - Saturation: 0f .. 2f (1 = normal)
+ * - Brightness: -100 .. +100 (0 = normal)
+ * - Contrast: 0.5f .. 1.5f (1 = normal)
+ * - Exposure: -1f .. +1f (0 = normal)
+ * - Temperature: -100 .. +100 (0 = neutral)
+ * - Tint: -100 .. +100 (0 = neutral)
+ * - Hue: -180 .. +180 (0 = normal)
  */
 data class Adjustments(
-  val saturation: Float = 1f,
-  val brightness: Float = 0f,
-  val contrast: Float = 1f,
-  val exposure: Float = 0f,
-  val temperature: Float = 0f,
-  val tint: Float = 0f,
-  val hue: Float = 0f
+    val saturation: Float,
+    val brightness: Float,
+    val contrast: Float,
+    val exposure: Float,
+    val temperature: Float,
+    val tint: Float,
+    val hue: Float,
 )
+
+val NeutralAdjustments =
+    Adjustments(
+        saturation = 1f,
+        brightness = 0f,
+        contrast = 1f,
+        exposure = 0f,
+        temperature = 0f,
+        tint = 0f,
+        hue = 0f,
+    )
 
 fun Adjustments.toColorMatrix(): ColorMatrix {
 
@@ -97,11 +107,16 @@ fun Adjustments.toColorMatrix(): ColorMatrix {
   )
 
   // ---------- Hue ----------
-  val hueMatrix = ColorMatrix().apply {
-    setRotate(0, h)
-    setRotate(1, h)
-    setRotate(2, h)
-  }
+  val hueMatrix = ColorMatrix()
+  hueMatrix.setRotate(0, h)
+  result.postConcat(hueMatrix)
+
+  hueMatrix.reset()
+  hueMatrix.setRotate(1, h)
+  result.postConcat(hueMatrix)
+
+  hueMatrix.reset()
+  hueMatrix.setRotate(2, h)
   result.postConcat(hueMatrix)
 
   // ---------- Brightness (LAST) ----------

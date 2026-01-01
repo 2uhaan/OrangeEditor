@@ -21,11 +21,11 @@ import com.ruhaan.orangeeditor.presentation.components.LargeIconButton
 @Composable
 fun EditorBottomBar(
     modifier: Modifier = Modifier,
-    onImageImportClick: (Bitmap) -> Unit = {},
+    onImageImportClick: (Bitmap) -> Unit,
     onTextClick: () -> Unit,
     onFilterClick: () -> Unit,
-    onAdjustmentsClick: () -> Unit = {},
-    onCropClick: () -> Unit = {},
+    onAdjustmentsClick: () -> Unit,
+    onCropClick: () -> Unit,
 ) {
   val context = LocalContext.current
 
@@ -87,7 +87,7 @@ fun EditorBottomBar(
           contentDescription = "adjustments",
           label = "Adjust",
       ) {
-        // TODO: Add adjustments functionality
+        onAdjustmentsClick()
       }
     }
 
