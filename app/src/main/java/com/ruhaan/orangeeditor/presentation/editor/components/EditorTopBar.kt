@@ -13,22 +13,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ruhaan.orangeeditor.R
+import com.ruhaan.orangeeditor.presentation.components.LargeIconButton
 import com.ruhaan.orangeeditor.presentation.theme.Typography
 
 @Composable
-fun EditorTopBar(
-    modifier: Modifier = Modifier,
-    onBackClick: () -> Unit,
-) {
+fun EditorTopBar(modifier: Modifier = Modifier,onBackClick: () -> Unit, onExportClick : () -> Unit) {
   Row(
       modifier = modifier.padding(end = 15.dp, bottom = 5.dp),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically,
   ) {
     LargeIconButton(
-        modifier = Modifier.weight(1f),
-        iconId = R.drawable.ic_back_arrow,
-        contentDescription = "go back",
+      modifier = Modifier.weight(1f),
+      iconId = R.drawable.ic_back_arrow,
+      contentDescription = "go back",
     ) {
       onBackClick()
     }
@@ -40,17 +38,17 @@ fun EditorTopBar(
     )
 
     LargeIconButton(
-        modifier = Modifier.weight(1f),
-        iconId = R.drawable.ic_undo_arrow,
-        contentDescription = "undo changes",
+      modifier = Modifier.weight(1f),
+      iconId = R.drawable.ic_undo_arrow,
+      contentDescription = "undo changes",
     ) {
       // TODO : Add undo functionality
     }
 
     LargeIconButton(
-        modifier = Modifier.weight(1f),
-        iconId = R.drawable.ic_redo_arrow,
-        contentDescription = "redo changes",
+      modifier = Modifier.weight(1f),
+      iconId = R.drawable.ic_redo_arrow,
+      contentDescription = "redo changes",
     ) {
       // TODO : Add redo functionality
     }
@@ -58,6 +56,7 @@ fun EditorTopBar(
     Button(
         onClick = {
           // TODO : Add export functionality
+          onExportClick()
         },
         colors = ButtonDefaults.buttonColors().copy(containerColor = Color.White),
     ) {

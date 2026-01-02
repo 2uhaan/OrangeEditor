@@ -1,18 +1,43 @@
 package com.ruhaan.orangeeditor.presentation.editor.components
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.ruhaan.orangeeditor.R
+import com.ruhaan.orangeeditor.presentation.components.LargeIconButton
 
 @Composable
-@Preview(showBackground = true)
-fun EditorBottomBar(modifier: Modifier = Modifier) {
+fun EditorBottomBar(
+    modifier: Modifier = Modifier,
+    onImageImportClick: (Bitmap) -> Unit = {},
+    onTextClick: (text: String) -> Unit = {},
+    onFilterClick: () -> Unit = {},
+    onAdjustmentsClick: () -> Unit = {},
+    onCropClick: () -> Unit = {},
+) {
+  val context = LocalContext.current
+
+  val launcher =
+      rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia()) { uri
+        ->
+        if (uri != null) {
+          val bitmap = loadBitmapFromUri(context, uri)
+          bitmap?.let { onImageImportClick(it) }
+        }
+      }
+
   LazyRow(
       modifier = modifier,
       horizontalArrangement = Arrangement.SpaceEvenly,
@@ -25,28 +50,22 @@ fun EditorBottomBar(modifier: Modifier = Modifier) {
           contentDescription = "import image",
           label = "Import",
       ) {
-        // TODO: Add import functionality
+        launcher.launch(
+            input =
+                PickVisualMediaRequest(
+                    mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
+                )
+        )
       }
     }
     item {
       LargeIconButton(
           modifier = Modifier.widthIn(min = 80.dp),
           iconId = R.drawable.ic_text,
-          contentDescription = "import image",
+          contentDescription = "text",
           label = "Text",
       ) {
-        // TODO: Add import functionality
-      }
-    }
-
-    item {
-      LargeIconButton(
-          modifier = Modifier.widthIn(min = 80.dp),
-          iconId = R.drawable.ic_emoji,
-          contentDescription = "add emoji",
-          label = "Emoji",
-      ) {
-        // TODO: Add emoji functionality
+        onTextClick("Hello 😀")
       }
     }
 
@@ -54,7 +73,7 @@ fun EditorBottomBar(modifier: Modifier = Modifier) {
       LargeIconButton(
           modifier = Modifier.widthIn(min = 80.dp),
           iconId = R.drawable.ic_image_filter,
-          contentDescription = "apply filter",
+          contentDescription = "filters",
           label = "Filter",
       ) {
         // TODO: Add filter functionality
@@ -65,7 +84,7 @@ fun EditorBottomBar(modifier: Modifier = Modifier) {
       LargeIconButton(
           modifier = Modifier.widthIn(min = 80.dp),
           iconId = R.drawable.ic_adjustments,
-          contentDescription = "apply adjustments",
+          contentDescription = "adjustments",
           label = "Adjust",
       ) {
         // TODO: Add adjustments functionality
@@ -78,9 +97,18 @@ fun EditorBottomBar(modifier: Modifier = Modifier) {
           iconId = R.drawable.ic_crop,
           contentDescription = "crop image",
           label = "Crop",
-      ) {
-        // TODO: Add crop functionality
-      }
+          onClick = onCropClick,
+      )
     }
+  }
+}
+
+fun loadBitmapFromUri(context: Context, uri: Uri): Bitmap? {
+  return try {
+    val source = ImageDecoder.createSource(context.contentResolver, uri)
+    ImageDecoder.decodeBitmap(source)
+  } catch (e: Exception) {
+    e.printStackTrace()
+    null
   }
 }
