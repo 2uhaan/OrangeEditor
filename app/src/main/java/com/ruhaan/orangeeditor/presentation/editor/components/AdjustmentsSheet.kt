@@ -24,7 +24,6 @@ import com.ruhaan.orangeeditor.domain.model.layer.Adjustments
 import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustments
 import com.ruhaan.orangeeditor.presentation.theme.CanvasOrange
 import com.ruhaan.orangeeditor.presentation.theme.Typography
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,8 +108,6 @@ fun AdjustmentsSheet(
     }
   }
 }
-
-fun quantize(value: Float, step: Float) = (value / step).roundToInt() * step
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

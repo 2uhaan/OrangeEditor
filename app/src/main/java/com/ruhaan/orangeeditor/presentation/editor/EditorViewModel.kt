@@ -137,13 +137,21 @@ class EditorViewModel : ViewModel() {
   fun updateImageFilterOfSelectedImagerLayer(imageFilter: ImageFilter) {
     val selectedLayer = getSelectedLayer()
     val selectedImageLayer = selectedLayer as? ImageLayer
-    selectedImageLayer?.let { updateLayer(updatedLayer = it.copy(imageFilter = imageFilter)) }
+    selectedImageLayer?.let {
+      updateLayer(
+          updatedLayer = it.copy(imageFilter = imageFilter, adjustments = NeutralAdjustments)
+      )
+    }
   }
 
   fun updateAdjustmentsOfSelectedImageLayer(adjustments: Adjustments) {
     val selectedLayer = getSelectedLayer()
     val selectedImageLayer = selectedLayer as? ImageLayer
-    selectedImageLayer?.let { updateLayer(updatedLayer = it.copy(adjustments = adjustments)) }
+    selectedImageLayer?.let {
+      updateLayer(
+          updatedLayer = it.copy(adjustments = adjustments, imageFilter = ImageFilter.NO_FILTER)
+      )
+    }
   }
 
   fun updateSelectedTextLayer(
