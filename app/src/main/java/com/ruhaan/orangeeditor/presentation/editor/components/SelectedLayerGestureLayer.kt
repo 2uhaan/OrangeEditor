@@ -9,7 +9,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import com.ruhaan.orangeeditor.domain.model.layer.EditorState
-import com.ruhaan.orangeeditor.domain.model.layer.EmojiLayer
 import com.ruhaan.orangeeditor.domain.model.layer.ImageLayer
 import com.ruhaan.orangeeditor.domain.model.layer.Layer
 import com.ruhaan.orangeeditor.domain.model.layer.TextLayer
@@ -28,26 +27,13 @@ fun SelectedLayerGestureLayer(
       modifier =
           Modifier.fillMaxSize().pointerInput(Unit) {
             detectTransformGestures { _, pan, zoom, rotation ->
-              val newScale = (currentLayer.transform.scale * zoom).coerceIn(0.1f, 2f)
-
               val newX = currentLayer.transform.x + pan.x
               val newY = currentLayer.transform.y + pan.y
 
               val updated =
                   when (val layer = currentLayer) {
                     is ImageLayer -> {
-                      val t =
-                          Transform(
-                              x = newX,
-                              y = newY,
-                              scale = newScale,
-                              rotation = layer.transform.rotation + rotation,
-                          )
-                      layer.copy(transform = t)
-                    }
-
-                    is EmojiLayer -> {
-                      val size = layer.bitmap.width.toFloat()
+                      val newScale = (layer.transform.scale * zoom).coerceIn(0.1f, 2f)
                       val t =
                           Transform(
                               x = newX,
@@ -59,14 +45,18 @@ fun SelectedLayerGestureLayer(
                     }
 
                     is TextLayer -> {
+                      val newFontSizeInPx = (layer.fontSizeInPx * zoom).coerceIn(0f, 300f)
                       val t =
                           Transform(
                               x = newX,
                               y = newY,
-                              scale = newScale,
+                              scale = currentLayer.transform.scale,
                               rotation = layer.transform.rotation + rotation,
                           )
-                      layer.copy(transform = t)
+                      layer.copy(
+                          transform = t,
+                          fontSizeInPx = newFontSizeInPx.toInt(),
+                      )
                     }
                   }
 

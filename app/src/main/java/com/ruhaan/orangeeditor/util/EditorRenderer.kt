@@ -3,13 +3,15 @@ package com.ruhaan.orangeeditor.util
 import android.graphics.Canvas
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
+import android.graphics.Typeface
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.core.graphics.withSave
-import com.ruhaan.orangeeditor.domain.model.layer.Adjustments
-import com.ruhaan.orangeeditor.domain.model.layer.EmojiLayer
 import com.ruhaan.orangeeditor.domain.model.layer.ImageFilter
 import com.ruhaan.orangeeditor.domain.model.layer.ImageLayer
 import com.ruhaan.orangeeditor.domain.model.layer.Layer
+import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustments
 import com.ruhaan.orangeeditor.domain.model.layer.TextLayer
 import com.ruhaan.orangeeditor.domain.model.layer.toColorMatrix
 
@@ -21,7 +23,6 @@ class EditorRenderer {
         .filter { it.visible }
         .forEach { layer ->
           when (layer) {
-            is EmojiLayer -> drawEmoji(canvas, layer)
             is TextLayer -> drawText(canvas, layer)
             is ImageLayer -> drawImage(canvas, layer)
           }
@@ -37,7 +38,7 @@ class EditorRenderer {
 
       val filter = layer.imageFilter
 
-      val isApplyCustomAdjustments = layer.adjustments == Adjustments()
+      val isApplyCustomAdjustments = layer.adjustments != NeutralAdjustments
 
       val paint =
           Paint().apply {
@@ -48,23 +49,14 @@ class EditorRenderer {
                 )
           }
 
+      val shouldApplyPaint = isApplyCustomAdjustments || filter != ImageFilter.NO_FILTER
+
       drawBitmap(
           layer.bitmap,
           -layer.bitmap.width / 2f,
           -layer.bitmap.height / 2f,
-          if (filter == ImageFilter.NO_FILTER) null else paint,
+          if (shouldApplyPaint) paint else null,
       )
-    }
-  }
-
-  private fun drawEmoji(canvas: Canvas, layer: EmojiLayer) {
-    canvas.withSave {
-      val t = layer.transform
-      translate(t.x, t.y)
-      rotate(t.rotation)
-      scale(t.scale, t.scale)
-
-      drawBitmap(layer.bitmap, -layer.bitmap.width / 2f, -layer.bitmap.height / 2f, null)
     }
   }
 
@@ -78,11 +70,28 @@ class EditorRenderer {
       val paint =
           Paint().apply {
             color = layer.color.toArgb()
-            textSize = layer.fontSizeInPx
+            textSize = layer.fontSizeInPx.toFloat()
             isAntiAlias = true
+            typeface = resolveTypeface(layer.fontWeight, layer.fontStyle)
           }
 
       drawText(layer.text, 0f, 0f, paint)
     }
   }
+}
+
+private fun resolveTypeface(
+    fontWeight: FontWeight,
+    fontStyle: FontStyle,
+): Typeface {
+
+  val style =
+      when {
+        fontWeight >= FontWeight.Bold && fontStyle == FontStyle.Italic -> Typeface.BOLD_ITALIC
+        fontWeight >= FontWeight.Bold -> Typeface.BOLD
+        fontStyle == FontStyle.Italic -> Typeface.ITALIC
+        else -> Typeface.NORMAL
+      }
+
+  return Typeface.create(Typeface.DEFAULT, style)
 }

@@ -1,14 +1,17 @@
 package com.ruhaan.orangeeditor.presentation.editor
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.ViewModel
 import com.ruhaan.orangeeditor.domain.model.layer.Adjustments
 import com.ruhaan.orangeeditor.domain.model.layer.EditorState
 import com.ruhaan.orangeeditor.domain.model.layer.ImageFilter
 import com.ruhaan.orangeeditor.domain.model.layer.ImageLayer
 import com.ruhaan.orangeeditor.domain.model.layer.Layer
+import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustments
 import com.ruhaan.orangeeditor.domain.model.layer.TextLayer
 import com.ruhaan.orangeeditor.domain.model.layer.Transform
 import java.util.UUID
@@ -51,7 +54,7 @@ class EditorViewModel : ViewModel() {
             id = UUID.randomUUID().toString(),
             bitmap = bitmap,
             imageFilter = imageFilter,
-            adjustments = Adjustments(hue = 100f),
+            adjustments = NeutralAdjustments,
             transform = Transform(x = x, y = y, scale = scale, rotation = 0f),
             zIndex = (_state.value.layers.maxOfOrNull { it.zIndex } ?: 0) + 1,
             originalWidth = bitmap.width,
@@ -63,11 +66,12 @@ class EditorViewModel : ViewModel() {
 
   fun addTextLayer(
       text: String,
+      color: Color,
+      fontSizeInPx: Int,
+      fontWeight: FontWeight,
+      fontStyle: FontStyle,
       canvasWidthInPx: Float,
       canvasHeightInPx: Float,
-      color: Color = Color.Black,
-      fontSizeInPx: Float = 80f,
-      fontFamily: FontFamily = FontFamily.Default,
   ) {
     val x = canvasWidthInPx / 2f
     val y = canvasHeightInPx / 2f
@@ -78,7 +82,8 @@ class EditorViewModel : ViewModel() {
             text = text,
             color = color,
             fontSizeInPx = fontSizeInPx,
-            fontFamily = fontFamily,
+            fontWeight = fontWeight,
+            fontStyle = fontStyle,
             transform =
                 Transform(
                     x = x,
@@ -97,6 +102,22 @@ class EditorViewModel : ViewModel() {
     _state.update { state -> state.copy(selectedLayerId = id) }
   }
 
+  fun getSelectedLayer(): Layer? {
+    return _state.value.layers.firstOrNull { it.id == _state.value.selectedLayerId }
+  }
+
+  fun getSelectedImagerLayer(): ImageLayer? {
+    val currentSelectedLayer = getSelectedLayer()
+    if (currentSelectedLayer is ImageLayer) return currentSelectedLayer
+    return null
+  }
+
+  fun getSelectedTextLayer(): TextLayer? {
+    val currentSelectedLayer = getSelectedLayer()
+    if (currentSelectedLayer is TextLayer) return currentSelectedLayer
+    return null
+  }
+
   fun updateLayer(updatedLayer: Layer) {
     _state.update { state ->
       state.copy(
@@ -104,19 +125,57 @@ class EditorViewModel : ViewModel() {
               state.layers.map { layer -> if (layer.id == updatedLayer.id) updatedLayer else layer }
       )
     }
+    Log.i("LOG", "${_state.value.layers}")
+  }
+
+  fun updateBitmapOfSelectedImageLayer(updatedBitmap: Bitmap) {
+    val selectedLayer = getSelectedLayer()
+    val selectedImageLayer = selectedLayer as? ImageLayer
+    selectedImageLayer?.let { updateLayer(updatedLayer = it.copy(bitmap = updatedBitmap)) }
+  }
+
+  fun updateImageFilterOfSelectedImagerLayer(imageFilter: ImageFilter) {
+    val selectedLayer = getSelectedLayer()
+    val selectedImageLayer = selectedLayer as? ImageLayer
+    selectedImageLayer?.let {
+      updateLayer(
+          updatedLayer = it.copy(imageFilter = imageFilter, adjustments = NeutralAdjustments)
+      )
+    }
+  }
+
+  fun updateAdjustmentsOfSelectedImageLayer(adjustments: Adjustments) {
+    val selectedLayer = getSelectedLayer()
+    val selectedImageLayer = selectedLayer as? ImageLayer
+    selectedImageLayer?.let {
+      updateLayer(
+          updatedLayer = it.copy(adjustments = adjustments, imageFilter = ImageFilter.NO_FILTER)
+      )
+    }
+  }
+
+  fun updateSelectedTextLayer(
+      text: String,
+      fontSizeInPx: Int,
+      fontColor: Color,
+      fontWeight: FontWeight,
+      fontStyle: FontStyle,
+  ) {
+    val selectedTextLayer = getSelectedTextLayer() ?: return
+
+    val updatedLayer =
+        selectedTextLayer.copy(
+            text = text,
+            fontSizeInPx = fontSizeInPx,
+            color = fontColor,
+            fontWeight = fontWeight,
+            fontStyle = fontStyle,
+        )
+
+    updateLayer(updatedLayer)
   }
 
   fun removeLayer(id: String) {
     _state.update { state -> state.copy(layers = state.layers.filterNot { it.id == id }) }
-  }
-
-  fun getSelectedLayer(): Layer? {
-    return _state.value.layers.firstOrNull { it.id == _state.value.selectedLayerId }
-  }
-
-  fun updateBitmapOfImageSelectedLayer(updatedBitmap: Bitmap) {
-    val selectedLayer = getSelectedLayer()
-    val selectedImageLayer = selectedLayer as? ImageLayer
-    selectedImageLayer?.let { updateLayer(updatedLayer = it.copy(bitmap = updatedBitmap)) }
   }
 }

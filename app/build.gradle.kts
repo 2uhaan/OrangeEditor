@@ -25,16 +25,24 @@ android {
     }
   }
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
   }
-  kotlinOptions { jvmTarget = "11" }
+
+  // Commented because if needed in future testing
+  //  kotlin {
+  //    compilerOptions {
+  //      jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+  //    }
+  //  }
+
   buildFeatures { compose = true }
 }
 
 dependencies {
   implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
   implementation("com.github.Tanish-Ranjan:crop-kit:1.1.0")
+  implementation("com.github.KvColorPalette:KvColorPicker-Android:3.0.1")
 
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.lifecycle.runtime.ktx)
