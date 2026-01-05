@@ -23,5 +23,5 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun OrangeEditorApp(viewmodel: EditorViewModel) {
   val navController = rememberNavController()
-  NavGraph(navController = navController,viewmodel = viewmodel)
+  NavGraph(navController = navController, viewmodel = viewmodel)
 }
