@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
@@ -34,6 +35,7 @@ import com.ruhaan.orangeeditor.presentation.editor.components.AdjustmentsSheet
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorBottomBar
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorCanvas
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorTopBar
+import com.ruhaan.orangeeditor.presentation.editor.components.FileNameSheet
 import com.ruhaan.orangeeditor.presentation.editor.components.FilterRow
 import com.ruhaan.orangeeditor.presentation.editor.components.SelectedLayerGestureLayer
 import com.ruhaan.orangeeditor.presentation.navigation.Route
@@ -50,12 +52,14 @@ fun EditorScreen(
   val state by viewModel.state.collectAsState()
   var currentSelectedTextLayer by remember { mutableStateOf(viewModel.getSelectedTextLayer()) }
   var currentSelectedImageLayer by remember { mutableStateOf(viewModel.getSelectedImagerLayer()) }
+  val context = LocalContext.current
 
   // Local states
   var canvasSize by remember { mutableStateOf(IntSize.Zero) }
   var showAddTextSheet by remember { mutableStateOf(false) }
   var showImageFilters by remember { mutableStateOf(false) }
   var showAdjustmentsSheet by remember { mutableStateOf(false) }
+  var showFileNameSheet by remember { mutableStateOf(false) }
 
   LaunchedEffect(state) {
     currentSelectedTextLayer = viewModel.getSelectedTextLayer()
@@ -101,13 +105,28 @@ fun EditorScreen(
     )
   }
 
+  if (showFileNameSheet) {
+    FileNameSheet(
+        currentFileName = state.fileName,
+        onDismissRequest = { showFileNameSheet = false },
+        onSave = viewModel::updateFileName,
+    )
+  }
+
   Scaffold(
       topBar = {
         Box(modifier = Modifier.background(color = CanvasOrange)) {
           EditorTopBar(
               modifier = Modifier.fillMaxWidth().statusBarsPadding(),
+              fileName = state.fileName,
+              canUndo = viewModel.canUndo(),
+              canRedo = viewModel.canRedo(),
               onBackClick = { navController.popBackStack() },
-          ) {}
+              onFileNameClick = { showFileNameSheet = true },
+              onUndoClick = { viewModel.undo() },
+              onRedoClick = { viewModel.redo() },
+              onExportClick = { viewModel.exportImage(context, canvasFormat, canvasSize) },
+          )
         }
       },
       bottomBar = {
