@@ -1,5 +1,7 @@
 package com.ruhaan.orangeeditor.presentation.editor
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +43,7 @@ import com.ruhaan.orangeeditor.presentation.editor.components.SelectedLayerGestu
 import com.ruhaan.orangeeditor.presentation.navigation.Route
 import com.ruhaan.orangeeditor.presentation.theme.CanvasOrange
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun EditorScreen(
     modifier: Modifier = Modifier,
@@ -121,10 +124,12 @@ fun EditorScreen(
               fileName = state.fileName,
               canUndo = viewModel.canUndo(),
               canRedo = viewModel.canRedo(),
+              canDelete = state.selectedLayerId != null,
               onBackClick = { navController.popBackStack() },
               onFileNameClick = { showFileNameSheet = true },
               onUndoClick = { viewModel.undo() },
               onRedoClick = { viewModel.redo() },
+              onDeleteClick = { state.selectedLayerId?.let { viewModel.removeLayer(it) } },
               onExportClick = { viewModel.exportImage(context, canvasFormat, canvasSize) },
           )
         }

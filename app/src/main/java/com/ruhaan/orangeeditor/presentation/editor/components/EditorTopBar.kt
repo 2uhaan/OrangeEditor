@@ -24,10 +24,12 @@ fun EditorTopBar(
     fileName: String,
     canUndo: Boolean,
     canRedo: Boolean,
+    canDelete: Boolean,
     onBackClick: () -> Unit,
     onFileNameClick: () -> Unit,
     onUndoClick: () -> Unit,
     onRedoClick: () -> Unit,
+    onDeleteClick: () -> Unit,
     onExportClick: () -> Unit,
 ) {
   Row(
@@ -67,6 +69,15 @@ fun EditorTopBar(
         enabled = canRedo,
     ) {
       onRedoClick()
+    }
+
+    LargeIconButton(
+        modifier = Modifier.weight(1f),
+        iconId = R.drawable.ic_delete,
+        contentDescription = "delete layer",
+        enabled = canDelete,
+    ) {
+      onDeleteClick()
     }
 
     Button(

@@ -15,6 +15,8 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.withTranslation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ruhaan.orangeeditor.domain.model.format.CanvasFormat
@@ -121,9 +123,6 @@ class EditorViewModel : ViewModel() {
     addLayer(layer)
   }
 
-  fun selectLayer(id: String?) {
-    _state.update { state -> state.copy(selectedLayerId = id) }
-  }
 
   fun getSelectedLayer(): Layer? {
     return _state.value.layers.firstOrNull { it.id == _state.value.selectedLayerId }
@@ -206,7 +205,9 @@ class EditorViewModel : ViewModel() {
 
   fun removeLayer(id: String) {
     saveSnapshot()
-    _state.update { state -> state.copy(layers = state.layers.filterNot { it.id == id }) }
+    _state.update { state ->
+      state.copy(layers = state.layers.filterNot { it.id == id }, selectedLayerId = null)
+    }
   }
 
   fun updateFileName(newName: String) {
@@ -273,8 +274,7 @@ class EditorViewModel : ViewModel() {
         val scaleX = canvasFormat.width.toFloat() / canvasScreenSize.width
         val scaleY = canvasFormat.height.toFloat() / canvasScreenSize.height
 
-        val exportBitmap =
-            Bitmap.createBitmap(canvasFormat.width, canvasFormat.height, Bitmap.Config.ARGB_8888)
+        val exportBitmap = createBitmap(canvasFormat.width, canvasFormat.height)
         val canvas = Canvas(exportBitmap)
         canvas.drawColor(android.graphics.Color.WHITE)
 
@@ -335,8 +335,7 @@ class EditorViewModel : ViewModel() {
   private fun applyFilterToBitmap(bitmap: Bitmap, layer: ImageLayer): Bitmap {
     val softwareBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true) ?: bitmap
 
-    val filtered =
-        Bitmap.createBitmap(softwareBitmap.width, softwareBitmap.height, Bitmap.Config.ARGB_8888)
+    val filtered = createBitmap(softwareBitmap.width, softwareBitmap.height)
     val canvas = Canvas(filtered)
 
     val colorMatrix =
@@ -363,17 +362,16 @@ class EditorViewModel : ViewModel() {
   ) {
     val processedBitmap = applyFilterToBitmap(layer.bitmap, layer)
 
-    canvas.save()
-    canvas.translate(layer.transform.x * scaleX, layer.transform.y * scaleY)
-    canvas.rotate(layer.transform.rotation)
-    canvas.scale(layer.transform.scale * scaleX, layer.transform.scale * scaleY)
-    canvas.drawBitmap(
-        processedBitmap,
-        -processedBitmap.width / 2f,
-        -processedBitmap.height / 2f,
-        null,
-    )
-    canvas.restore()
+    canvas.withTranslation(layer.transform.x * scaleX, layer.transform.y * scaleY) {
+      rotate(layer.transform.rotation)
+      scale(layer.transform.scale * scaleX, layer.transform.scale * scaleY)
+      drawBitmap(
+          processedBitmap,
+          -processedBitmap.width / 2f,
+          -processedBitmap.height / 2f,
+          null,
+      )
+    }
 
     processedBitmap.recycle()
   }
@@ -399,11 +397,10 @@ class EditorViewModel : ViewModel() {
               }.let { android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, it) }
         }
 
-    canvas.save()
-    canvas.translate(layer.transform.x * scaleX, layer.transform.y * scaleY)
-    canvas.rotate(layer.transform.rotation)
-    canvas.scale(layer.transform.scale * scaleX, layer.transform.scale * scaleY)
-    canvas.drawText(layer.text, -paint.measureText(layer.text) / 2f, 0f, paint)
-    canvas.restore()
+    canvas.withTranslation(layer.transform.x * scaleX, layer.transform.y * scaleY) {
+      rotate(layer.transform.rotation)
+      scale(layer.transform.scale * scaleX, layer.transform.scale * scaleY)
+      drawText(layer.text, -paint.measureText(layer.text) / 2f, 0f, paint)
+    }
   }
 }
