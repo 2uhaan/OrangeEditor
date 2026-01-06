@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
+import androidx.core.graphics.createBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ruhaan.orangeeditor.domain.model.format.CanvasFormat
@@ -122,10 +123,6 @@ class EditorViewModel : ViewModel() {
     addLayer(layer)
   }
 
-  fun selectLayer(id: String?) {
-    _state.update { state -> state.copy(selectedLayerId = id) }
-  }
-
   fun getSelectedLayer(): Layer? {
     return _state.value.layers.firstOrNull { it.id == _state.value.selectedLayerId }
   }
@@ -207,7 +204,9 @@ class EditorViewModel : ViewModel() {
 
   fun removeLayer(id: String) {
     saveSnapshot()
-    _state.update { state -> state.copy(layers = state.layers.filterNot { it.id == id }) }
+    _state.update { state ->
+      state.copy(layers = state.layers.filterNot { it.id == id }, selectedLayerId = null)
+    }
   }
 
   fun updateFileName(newName: String) {
@@ -274,8 +273,7 @@ class EditorViewModel : ViewModel() {
         val scaleX = canvasFormat.width.toFloat() / canvasScreenSize.width
         val scaleY = canvasFormat.height.toFloat() / canvasScreenSize.height
 
-        val exportBitmap =
-            Bitmap.createBitmap(canvasFormat.width, canvasFormat.height, Bitmap.Config.ARGB_8888)
+        val exportBitmap = createBitmap(canvasFormat.width, canvasFormat.height)
         val canvas = Canvas(exportBitmap)
         canvas.drawColor(android.graphics.Color.WHITE)
 
