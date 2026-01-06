@@ -11,7 +11,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
@@ -26,7 +25,7 @@ import com.ruhaan.orangeeditor.domain.model.layer.Layer
 import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustments
 import com.ruhaan.orangeeditor.domain.model.layer.TextLayer
 import com.ruhaan.orangeeditor.domain.model.layer.Transform
-import com.ruhaan.orangeeditor.domain.model.layer.toColorMatrix
+import com.ruhaan.orangeeditor.util.EditorRenderer
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -41,6 +40,8 @@ class EditorViewModel : ViewModel() {
 
   private val _state = MutableStateFlow(EditorState())
   val state = _state.asStateFlow()
+
+  private val editorRender = EditorRenderer()
 
   private val undoStack = mutableListOf<List<Layer>>()
   private val redoStack = mutableListOf<List<Layer>>()
@@ -283,8 +284,8 @@ class EditorViewModel : ViewModel() {
             .filter { it.visible }
             .forEach { layer ->
               when (layer) {
-                is ImageLayer -> drawImageLayerForExport(canvas, layer, scaleX, scaleY)
-                is TextLayer -> drawTextLayerForExport(canvas, layer, scaleX, scaleY)
+                is ImageLayer -> editorRender.drawImage(canvas, layer, scaleX, scaleY)
+                is TextLayer -> editorRender.drawText(canvas, layer, scaleX, scaleY)
               }
             }
 
@@ -330,80 +331,5 @@ class EditorViewModel : ViewModel() {
       e.printStackTrace()
       false
     }
-  }
-
-  private fun applyFilterToBitmap(bitmap: Bitmap, layer: ImageLayer): Bitmap {
-    val softwareBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true) ?: bitmap
-
-    val filtered =
-        Bitmap.createBitmap(softwareBitmap.width, softwareBitmap.height, Bitmap.Config.ARGB_8888)
-    val canvas = Canvas(filtered)
-
-    val colorMatrix =
-        if (layer.adjustments != NeutralAdjustments) {
-          layer.adjustments.toColorMatrix()
-        } else {
-          layer.imageFilter.colorMatrix
-        }
-
-    val paint =
-        android.graphics.Paint().apply {
-          colorFilter = android.graphics.ColorMatrixColorFilter(colorMatrix)
-        }
-
-    canvas.drawBitmap(softwareBitmap, 0f, 0f, paint)
-    return filtered
-  }
-
-  private fun drawImageLayerForExport(
-      canvas: Canvas,
-      layer: ImageLayer,
-      scaleX: Float,
-      scaleY: Float,
-  ) {
-    val processedBitmap = applyFilterToBitmap(layer.bitmap, layer)
-
-    canvas.save()
-    canvas.translate(layer.transform.x * scaleX, layer.transform.y * scaleY)
-    canvas.rotate(layer.transform.rotation)
-    canvas.scale(layer.transform.scale * scaleX, layer.transform.scale * scaleY)
-    canvas.drawBitmap(
-        processedBitmap,
-        -processedBitmap.width / 2f,
-        -processedBitmap.height / 2f,
-        null,
-    )
-    canvas.restore()
-
-    processedBitmap.recycle()
-  }
-
-  private fun drawTextLayerForExport(
-      canvas: Canvas,
-      layer: TextLayer,
-      scaleX: Float,
-      scaleY: Float,
-  ) {
-    val paint =
-        android.graphics.Paint().apply {
-          color = layer.color.toArgb()
-          textSize = layer.fontSizeInPx * scaleX
-          isAntiAlias = true
-          typeface =
-              when {
-                layer.fontWeight >= FontWeight.Bold && layer.fontStyle == FontStyle.Italic ->
-                    android.graphics.Typeface.BOLD_ITALIC
-                layer.fontWeight >= FontWeight.Bold -> android.graphics.Typeface.BOLD
-                layer.fontStyle == FontStyle.Italic -> android.graphics.Typeface.ITALIC
-                else -> android.graphics.Typeface.NORMAL
-              }.let { android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, it) }
-        }
-
-    canvas.save()
-    canvas.translate(layer.transform.x * scaleX, layer.transform.y * scaleY)
-    canvas.rotate(layer.transform.rotation)
-    canvas.scale(layer.transform.scale * scaleX, layer.transform.scale * scaleY)
-    canvas.drawText(layer.text, -paint.measureText(layer.text) / 2f, 0f, paint)
-    canvas.restore()
   }
 }
