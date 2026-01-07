@@ -20,31 +20,31 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.ruhaan.orangeeditor.domain.model.layer.Adjustments
-import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustments
+import com.ruhaan.orangeeditor.domain.model.layer.Adjustment
+import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustment
 import com.ruhaan.orangeeditor.presentation.theme.CanvasOrange
 import com.ruhaan.orangeeditor.presentation.theme.Typography
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdjustmentsSheet(
-    modifier: Modifier = Modifier,
-    adjustments: Adjustments,
-    onAdjustmentsConfirm: (Adjustments) -> Unit,
-    onDismissRequest: () -> Unit,
+  modifier: Modifier = Modifier,
+  adjustment: Adjustment,
+  onAdjustmentsConfirm: (Adjustment) -> Unit,
+  onDismissRequest: () -> Unit,
 ) {
 
-  val saturation = remember { SliderState(value = adjustments.saturation, valueRange = 0f..2f) }
+  val saturation = remember { SliderState(value = adjustment.saturation, valueRange = 0f..2f) }
   val brightness = remember {
-    SliderState(value = adjustments.brightness, valueRange = -100f..100f)
+    SliderState(value = adjustment.brightness, valueRange = -100f..100f)
   }
-  val contrast = remember { SliderState(value = adjustments.contrast, valueRange = 0.5f..1.5f) }
-  val exposure = remember { SliderState(value = adjustments.exposure, valueRange = -1f..1f) }
+  val contrast = remember { SliderState(value = adjustment.contrast, valueRange = 0.5f..1.5f) }
+  val exposure = remember { SliderState(value = adjustment.exposure, valueRange = -1f..1f) }
   val temperature = remember {
-    SliderState(value = adjustments.temperature, valueRange = -100f..100f)
+    SliderState(value = adjustment.temperature, valueRange = -100f..100f)
   }
-  val tint = remember { SliderState(value = adjustments.tint, valueRange = -100f..100f) }
-  val hue = remember { SliderState(value = adjustments.hue, valueRange = -180f..180f) }
+  val tint = remember { SliderState(value = adjustment.tint, valueRange = -100f..100f) }
+  val hue = remember { SliderState(value = adjustment.hue, valueRange = -180f..180f) }
 
   ModalBottomSheet(modifier = modifier, onDismissRequest = onDismissRequest) {
     Column(modifier = modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -63,13 +63,13 @@ fun AdjustmentsSheet(
         ) {
           OutlinedButton(
               onClick = {
-                saturation.value = NeutralAdjustments.saturation
-                brightness.value = NeutralAdjustments.brightness
-                contrast.value = NeutralAdjustments.contrast
-                exposure.value = NeutralAdjustments.exposure
-                temperature.value = NeutralAdjustments.temperature
-                tint.value = NeutralAdjustments.tint
-                hue.value = NeutralAdjustments.hue
+                saturation.value = NeutralAdjustment.saturation
+                brightness.value = NeutralAdjustment.brightness
+                contrast.value = NeutralAdjustment.contrast
+                exposure.value = NeutralAdjustment.exposure
+                temperature.value = NeutralAdjustment.temperature
+                tint.value = NeutralAdjustment.tint
+                hue.value = NeutralAdjustment.hue
               },
               border = BorderStroke(width = 2.dp, color = CanvasOrange),
           ) {
@@ -79,8 +79,8 @@ fun AdjustmentsSheet(
           }
           Button(
               onClick = {
-                val adjustments =
-                    Adjustments(
+                val adjustment =
+                    Adjustment(
                         saturation = saturation.value,
                         brightness = brightness.value,
                         contrast = contrast.value,
@@ -89,7 +89,7 @@ fun AdjustmentsSheet(
                         tint = tint.value,
                         hue = hue.value,
                     )
-                onAdjustmentsConfirm(adjustments)
+                onAdjustmentsConfirm(adjustment)
                 onDismissRequest()
               }
           ) {

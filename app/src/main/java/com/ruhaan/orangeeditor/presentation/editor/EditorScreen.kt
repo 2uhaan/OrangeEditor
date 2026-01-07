@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ruhaan.orangeeditor.domain.model.format.CanvasFormat
-import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustments
+import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustment
 import com.ruhaan.orangeeditor.presentation.editor.components.AddTextSheet
 import com.ruhaan.orangeeditor.presentation.editor.components.AdjustmentsSheet
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorBottomBar
@@ -103,7 +103,7 @@ fun EditorScreen(
   if (showAdjustmentsSheet) {
     AdjustmentsSheet(
         onDismissRequest = { showAdjustmentsSheet = false },
-        adjustments = currentSelectedImageLayer?.adjustments ?: NeutralAdjustments,
+        adjustment = currentSelectedImageLayer?.adjustment ?: NeutralAdjustment,
         onAdjustmentsConfirm = viewModel::updateAdjustmentsOfSelectedImageLayer,
     )
   }

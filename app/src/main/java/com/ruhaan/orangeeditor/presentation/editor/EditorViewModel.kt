@@ -18,12 +18,12 @@ import androidx.core.graphics.createBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ruhaan.orangeeditor.domain.model.format.CanvasFormat
-import com.ruhaan.orangeeditor.domain.model.layer.Adjustments
+import com.ruhaan.orangeeditor.domain.model.layer.Adjustment
 import com.ruhaan.orangeeditor.domain.model.layer.EditorState
 import com.ruhaan.orangeeditor.domain.model.layer.ImageFilter
 import com.ruhaan.orangeeditor.domain.model.layer.ImageLayer
 import com.ruhaan.orangeeditor.domain.model.layer.Layer
-import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustments
+import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustment
 import com.ruhaan.orangeeditor.domain.model.layer.TextLayer
 import com.ruhaan.orangeeditor.domain.model.layer.Transform
 import com.ruhaan.orangeeditor.util.EditorRenderer
@@ -79,7 +79,7 @@ class EditorViewModel : ViewModel() {
             id = UUID.randomUUID().toString(),
             bitmap = bitmap,
             imageFilter = imageFilter,
-            adjustments = NeutralAdjustments,
+            adjustment = NeutralAdjustment,
             transform = Transform(x = x, y = y, scale = scale, rotation = 0f),
             zIndex = (_state.value.layers.maxOfOrNull { it.zIndex } ?: 0) + 1,
             originalWidth = bitmap.width,
@@ -164,17 +164,17 @@ class EditorViewModel : ViewModel() {
     selectedImageLayer?.let {
       saveSnapshot()
       updateLayer(
-          updatedLayer = it.copy(imageFilter = imageFilter, adjustments = NeutralAdjustments)
+          updatedLayer = it.copy(imageFilter = imageFilter, adjustment = NeutralAdjustment)
       )
     }
   }
 
-  fun updateAdjustmentsOfSelectedImageLayer(adjustments: Adjustments) {
+  fun updateAdjustmentsOfSelectedImageLayer(adjustment: Adjustment) {
     val selectedLayer = getSelectedLayer()
     val selectedImageLayer = selectedLayer as? ImageLayer
     selectedImageLayer?.let {
       updateLayer(
-          updatedLayer = it.copy(adjustments = adjustments, imageFilter = ImageFilter.NO_FILTER)
+          updatedLayer = it.copy(adjustment = adjustment, imageFilter = ImageFilter.NO_FILTER)
       )
     }
   }

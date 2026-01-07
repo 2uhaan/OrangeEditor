@@ -11,7 +11,7 @@ import androidx.core.graphics.withSave
 import com.ruhaan.orangeeditor.domain.model.layer.ImageFilter
 import com.ruhaan.orangeeditor.domain.model.layer.ImageLayer
 import com.ruhaan.orangeeditor.domain.model.layer.Layer
-import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustments
+import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustment
 import com.ruhaan.orangeeditor.domain.model.layer.TextLayer
 import com.ruhaan.orangeeditor.domain.model.layer.toColorMatrix
 
@@ -43,13 +43,13 @@ class EditorRenderer {
 
       val filter = layer.imageFilter
 
-      val isApplyCustomAdjustments = layer.adjustments != NeutralAdjustments
+      val isApplyCustomAdjustments = layer.adjustment != NeutralAdjustment
 
       val paint =
           Paint().apply {
             colorFilter =
                 ColorMatrixColorFilter(
-                    if (isApplyCustomAdjustments) layer.adjustments.toColorMatrix()
+                    if (isApplyCustomAdjustments) layer.adjustment.toColorMatrix()
                     else layer.imageFilter.colorMatrix
                 )
           }
