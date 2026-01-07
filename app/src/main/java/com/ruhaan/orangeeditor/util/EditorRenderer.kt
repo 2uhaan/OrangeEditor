@@ -29,12 +29,17 @@ class EditorRenderer {
         }
   }
 
-  private fun drawImage(canvas: Canvas, layer: ImageLayer) {
+  fun drawImage(
+      canvas: Canvas,
+      layer: ImageLayer,
+      scaleX: Float = 1f,
+      scaleY: Float = 1f,
+  ): Canvas {
     canvas.withSave {
       val t = layer.transform
-      translate(t.x, t.y)
+      translate(t.x * scaleX, t.y * scaleY)
       rotate(t.rotation)
-      scale(t.scale, t.scale)
+      scale(t.scale * scaleX, t.scale * scaleY)
 
       val filter = layer.imageFilter
 
@@ -58,14 +63,20 @@ class EditorRenderer {
           if (shouldApplyPaint) paint else null,
       )
     }
+    return canvas
   }
 
-  private fun drawText(canvas: Canvas, layer: TextLayer) {
+  fun drawText(
+      canvas: Canvas,
+      layer: TextLayer,
+      scaleX: Float = 1f,
+      scaleY: Float = 1f,
+  ) {
     canvas.withSave {
       val t = layer.transform
-      translate(t.x, t.y)
+      translate(t.x * scaleX, t.y * scaleY)
       rotate(t.rotation)
-      scale(t.scale, t.scale)
+      scale(t.scale * scaleX, t.scale * scaleY)
 
       val paint =
           Paint().apply {
@@ -78,20 +89,20 @@ class EditorRenderer {
       drawText(layer.text, 0f, 0f, paint)
     }
   }
-}
 
-private fun resolveTypeface(
-    fontWeight: FontWeight,
-    fontStyle: FontStyle,
-): Typeface {
+  private fun resolveTypeface(
+      fontWeight: FontWeight,
+      fontStyle: FontStyle,
+  ): Typeface {
 
-  val style =
-      when {
-        fontWeight >= FontWeight.Bold && fontStyle == FontStyle.Italic -> Typeface.BOLD_ITALIC
-        fontWeight >= FontWeight.Bold -> Typeface.BOLD
-        fontStyle == FontStyle.Italic -> Typeface.ITALIC
-        else -> Typeface.NORMAL
-      }
+    val style =
+        when {
+          fontWeight >= FontWeight.Bold && fontStyle == FontStyle.Italic -> Typeface.BOLD_ITALIC
+          fontWeight >= FontWeight.Bold -> Typeface.BOLD
+          fontStyle == FontStyle.Italic -> Typeface.ITALIC
+          else -> Typeface.NORMAL
+        }
 
-  return Typeface.create(Typeface.DEFAULT, style)
+    return Typeface.create(Typeface.DEFAULT, style)
+  }
 }

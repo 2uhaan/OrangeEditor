@@ -16,6 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ruhaan.orangeeditor.R
+import com.ruhaan.orangeeditor.presentation.theme.CanvasOrange
 import com.ruhaan.orangeeditor.presentation.theme.Typography
 
 @Composable
@@ -24,10 +25,15 @@ fun LargeIconButton(
     iconId: Int,
     contentDescription: String,
     label: String? = null,
+    enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
   Box(
-      modifier = modifier.clip(CircleShape).size(size = 52.dp).clickable(onClick = onClick),
+      modifier =
+          modifier
+              .clip(CircleShape)
+              .size(size = 52.dp)
+              .clickable(enabled = enabled, onClick = onClick),
       contentAlignment = Alignment.Center,
   ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -35,6 +41,7 @@ fun LargeIconButton(
           painter = painterResource(id = iconId),
           contentDescription = contentDescription,
           modifier = Modifier.size(size = 28.dp),
+          tint = if (enabled) Color.Black else CanvasOrange,
       )
       label?.let { Text(text = label, style = Typography.labelSmall.copy(color = Color.Gray)) }
     }

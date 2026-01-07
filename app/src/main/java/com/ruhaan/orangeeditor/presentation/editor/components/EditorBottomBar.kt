@@ -106,7 +106,12 @@ fun EditorBottomBar(
 fun loadBitmapFromUri(context: Context, uri: Uri): Bitmap? {
   return try {
     val source = ImageDecoder.createSource(context.contentResolver, uri)
-    ImageDecoder.decodeBitmap(source)
+    val bitmap =
+        ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
+          decoder.isMutableRequired = true
+          decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+        }
+    return bitmap
   } catch (e: Exception) {
     e.printStackTrace()
     null
