@@ -205,7 +205,12 @@ class EditorViewModel : ViewModel() {
   fun removeLayer(id: String) {
     saveSnapshot()
     _state.update { state ->
-      state.copy(layers = state.layers.filterNot { it.id == id }, selectedLayerId = null)
+      val remainingLayers = state.layers.filterNot { it.id == id }
+
+      // Auto-select the new top layer (last in list)
+      val newSelectedId = remainingLayers.lastOrNull()?.id
+
+      state.copy(layers = remainingLayers, selectedLayerId = newSelectedId)
     }
   }
 
@@ -244,7 +249,11 @@ class EditorViewModel : ViewModel() {
     redoStack.add(currentLayers)
 
     val previousLayers = undoStack.removeAt(undoStack.lastIndex)
-    _state.update { it.copy(layers = previousLayers, selectedLayerId = null) }
+
+    // Auto-select the top layer (last in list)
+    val newSelectedId = previousLayers.lastOrNull()?.id
+
+    _state.update { it.copy(layers = previousLayers, selectedLayerId = newSelectedId) }
   }
 
   fun redo() {
@@ -254,7 +263,11 @@ class EditorViewModel : ViewModel() {
     undoStack.add(currentLayers)
 
     val nextLayers = redoStack.removeAt(redoStack.lastIndex)
-    _state.update { it.copy(layers = nextLayers, selectedLayerId = null) }
+
+    // Auto-select the top layer (last in list)
+    val newSelectedId = nextLayers.lastOrNull()?.id
+
+    _state.update { it.copy(layers = nextLayers, selectedLayerId = newSelectedId) }
   }
 
   fun exportImage(context: Context, canvasFormat: CanvasFormat, canvasScreenSize: IntSize) {
