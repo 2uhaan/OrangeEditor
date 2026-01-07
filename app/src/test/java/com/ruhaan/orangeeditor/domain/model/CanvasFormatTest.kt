@@ -1,6 +1,6 @@
 package com.ruhaan.orangeeditor.domain.model
 
-import com.ruhaan.orangeeditor.domain.CanvasFormat
+import com.ruhaan.orangeeditor.domain.model.format.CanvasFormat
 import org.junit.Assert.*
 import org.junit.Test
 

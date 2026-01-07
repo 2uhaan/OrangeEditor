@@ -6,12 +6,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ruhaan.orangeeditor.R
@@ -45,13 +48,25 @@ fun EditorTopBar(
       onBackClick()
     }
 
-    Text(
-        text = fileName,
+    Row(
         modifier = Modifier.weight(weight = 3f).clickable { onFileNameClick() },
-        style = Typography.titleLarge.copy(fontWeight = FontWeight.Medium),
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-    )
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start,
+    ) {
+      Text(
+          modifier = Modifier.weight(1f, fill = false),
+          text = fileName,
+          style = Typography.titleLarge.copy(fontWeight = FontWeight.Medium),
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
+          textDecoration = TextDecoration.Underline,
+      )
+      Icon(
+          modifier = Modifier.padding(start = 8.dp),
+          painter = painterResource(R.drawable.ic_edit_pencil),
+          contentDescription = null,
+      )
+    }
 
     LargeIconButton(
         modifier = Modifier.weight(1f),
