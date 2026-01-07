@@ -26,6 +26,7 @@ fun EditorBottomBar(
     onFilterClick: () -> Unit,
     onAdjustmentsClick: () -> Unit,
     onCropClick: () -> Unit,
+    onPositionClick: () -> Unit,
 ) {
   val context = LocalContext.current
 
@@ -99,6 +100,16 @@ fun EditorBottomBar(
           label = "Crop",
           onClick = onCropClick,
       )
+    }
+    item {
+      LargeIconButton(
+          modifier = Modifier.widthIn(min = 80.dp),
+          iconId = R.drawable.ic_position, // ← Use your position icon
+          contentDescription = "Position",
+          label = "Position",
+      ) {
+        onPositionClick()
+      }
     }
   }
 }

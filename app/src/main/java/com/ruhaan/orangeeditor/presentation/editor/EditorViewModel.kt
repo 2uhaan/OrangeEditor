@@ -30,7 +30,6 @@ import com.ruhaan.orangeeditor.util.EditorRenderer
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -48,6 +47,9 @@ class EditorViewModel : ViewModel() {
   private val redoStack = mutableListOf<List<Layer>>()
   private val maxHistorySize = 20
 
+  private var nextTextId = 1
+  private var nextImageId = 1
+
   fun resetState() {
     _state.update { it.copy(layers = emptyList(), selectedLayerId = null) }
   }
@@ -55,6 +57,10 @@ class EditorViewModel : ViewModel() {
   fun addLayer(layer: Layer) {
     saveSnapshot()
     _state.update { it.copy(layers = it.layers + layer, selectedLayerId = layer.id) }
+  }
+
+  fun selectLayer(layerId: String?) {
+    _state.update { it.copy(selectedLayerId = layerId) }
   }
 
   fun addImageLayer(
@@ -74,9 +80,11 @@ class EditorViewModel : ViewModel() {
     val x = canvasWidthInPx / 2f
     val y = canvasHeightInPx / 2f
 
+    val id = "image_${nextImageId++}" // ← Changed: image_1, image_2, ...
+
     val layer =
         ImageLayer(
-            id = UUID.randomUUID().toString(),
+            id = id,
             bitmap = bitmap,
             imageFilter = imageFilter,
             adjustments = NeutralAdjustments,
@@ -101,9 +109,11 @@ class EditorViewModel : ViewModel() {
     val x = canvasWidthInPx / 2f
     val y = canvasHeightInPx / 2f
 
+    val id = "text_${nextTextId++}" // ← Changed: text_1, text_2, ...
+
     val layer =
         TextLayer(
-            id = UUID.randomUUID().toString(),
+            id = id,
             text = text,
             color = color,
             fontSizeInPx = fontSizeInPx,
@@ -268,6 +278,34 @@ class EditorViewModel : ViewModel() {
     val newSelectedId = nextLayers.lastOrNull()?.id
 
     _state.update { it.copy(layers = nextLayers, selectedLayerId = newSelectedId) }
+  }
+
+  fun moveLayerUp(layerId: String) {
+    val layers = _state.value.layers
+    val index = layers.indexOfFirst { it.id == layerId }
+    if (index <= 0 || index >= layers.size) return
+
+    saveSnapshot()
+    val newLayers = layers.toMutableList()
+    newLayers.swap(index, index - 1)
+    _state.update { it.copy(layers = newLayers) }
+  }
+
+  fun moveLayerDown(layerId: String) {
+    val layers = _state.value.layers
+    val index = layers.indexOfFirst { it.id == layerId }
+    if (index < 0 || index >= layers.size - 1) return
+
+    saveSnapshot()
+    val newLayers = layers.toMutableList()
+    newLayers.swap(index, index + 1)
+    _state.update { it.copy(layers = newLayers) }
+  }
+
+  private fun MutableList<Layer>.swap(i: Int, j: Int) {
+    val temp = this[i]
+    this[i] = this[j]
+    this[j] = temp
   }
 
   fun exportImage(context: Context, canvasFormat: CanvasFormat, canvasScreenSize: IntSize) {
