@@ -11,12 +11,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.ruhaan.orangeeditor.R
 import com.ruhaan.orangeeditor.presentation.components.LargeIconButton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun EditorBottomBar(
@@ -28,13 +32,16 @@ fun EditorBottomBar(
     onCropClick: () -> Unit,
 ) {
   val context = LocalContext.current
+  val scope = rememberCoroutineScope()
 
   val launcher =
       rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia()) { uri
         ->
         if (uri != null) {
-          val bitmap = loadBitmapFromUri(context, uri)
-          bitmap?.let { onImageImportClick(it) }
+          scope.launch {
+            val bitmap = loadBitmapFromUri(context, uri)
+            bitmap?.let { onImageImportClick(it) }
+          }
         }
       }
 
@@ -103,17 +110,19 @@ fun EditorBottomBar(
   }
 }
 
-fun loadBitmapFromUri(context: Context, uri: Uri): Bitmap? {
-  return try {
-    val source = ImageDecoder.createSource(context.contentResolver, uri)
-    val bitmap =
+suspend fun loadBitmapFromUri(
+    context: Context,
+    uri: Uri,
+): Bitmap? =
+    withContext(Dispatchers.IO) {
+      try {
+        val source = ImageDecoder.createSource(context.contentResolver, uri)
         ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
           decoder.isMutableRequired = true
           decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
         }
-    return bitmap
-  } catch (e: Exception) {
-    e.printStackTrace()
-    null
-  }
-}
+      } catch (e: Exception) {
+        e.printStackTrace()
+        null
+      }
+    }
