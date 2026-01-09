@@ -280,6 +280,15 @@ class EditorViewModel : ViewModel() {
     _state.update { it.copy(layers = nextLayers, selectedLayerId = newSelectedId) }
   }
 
+  private fun reassignZIndex(layers: List<Layer>): List<Layer> {
+    return layers.mapIndexed { index, layer ->
+      when (layer) {
+        is TextLayer -> layer.copy(zIndex = index)
+        is ImageLayer -> layer.copy(zIndex = index)
+      }
+    }
+  }
+
   fun moveLayerUp(layerId: String) {
     val layers = _state.value.layers
     val index = layers.indexOfFirst { it.id == layerId }
@@ -288,7 +297,9 @@ class EditorViewModel : ViewModel() {
     saveSnapshot()
     val newLayers = layers.toMutableList()
     newLayers.swap(index, index - 1)
-    _state.update { it.copy(layers = newLayers) }
+    val reindexed = reassignZIndex(newLayers)
+    val newSelectedId = reindexed.lastOrNull()?.id // ← Select the new top layer
+    _state.update { it.copy(layers = reindexed, selectedLayerId = newSelectedId) }
   }
 
   fun moveLayerDown(layerId: String) {
@@ -299,7 +310,23 @@ class EditorViewModel : ViewModel() {
     saveSnapshot()
     val newLayers = layers.toMutableList()
     newLayers.swap(index, index + 1)
-    _state.update { it.copy(layers = newLayers) }
+    val reindexed = reassignZIndex(newLayers)
+    val newSelectedId = reindexed.lastOrNull()?.id // ← Select the new top layer
+    _state.update { it.copy(layers = reindexed, selectedLayerId = newSelectedId) }
+  }
+
+  fun moveLayerToTop(layerId: String) {
+    val layers = _state.value.layers
+    val index = layers.indexOfFirst { it.id == layerId }
+    if (index < 0 || index == layers.size - 1) return
+
+    saveSnapshot()
+    val newLayers = layers.toMutableList()
+    val layer = newLayers.removeAt(index)
+    newLayers.add(layer)
+    val reindexed = reassignZIndex(newLayers)
+    val newSelectedId = reindexed.lastOrNull()?.id // ← Select the new top layer
+    _state.update { it.copy(layers = reindexed, selectedLayerId = newSelectedId) }
   }
 
   private fun MutableList<Layer>.swap(i: Int, j: Int) {

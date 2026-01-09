@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -77,14 +78,19 @@ fun LayerPositionSheet(
           modifier = Modifier.fillMaxWidth().weight(1f),
           verticalArrangement = Arrangement.spacedBy(6.dp),
       ) {
-        items(layers.reversed()) { layer ->
-          LayerPositionItem(
-              layer = layer,
-              isSelected = layer.id == selectedLayerId,
-              onLayerLongPress = { onLayerSelected(layer.id) },
-              onMoveUp = { onMoveUp(layer.id) },
-              onMoveDown = { onMoveDown(layer.id) },
-          )
+        items(
+            items = layers,
+            key = { it.id },
+        ) { layer ->
+          Box(modifier = Modifier.animateItem()) {
+            LayerPositionItem(
+                layer = layer,
+                isSelected = layer.id == selectedLayerId,
+                onLayerLongPress = { onLayerSelected(layer.id) },
+                onMoveUp = { onMoveUp(layer.id) },
+                onMoveDown = { onMoveDown(layer.id) },
+            )
+          }
         }
       }
     }
