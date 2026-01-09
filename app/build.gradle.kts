@@ -2,6 +2,8 @@ plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.android)
   alias(libs.plugins.kotlin.compose)
+  id("com.google.devtools.ksp")
+  id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -10,7 +12,7 @@ android {
 
   defaultConfig {
     applicationId = "com.ruhaan.orangeeditor"
-    minSdk = 28
+    minSdk = 29
     targetSdk = 36
     versionCode = 1
     versionName = "1.0"
@@ -39,10 +41,20 @@ android {
   buildFeatures { compose = true }
 }
 
+//noinspection UseTomlInstead
 dependencies {
   implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
   implementation("com.github.Tanish-Ranjan:crop-kit:1.1.0")
   implementation("com.github.KvColorPalette:KvColorPicker-Android:3.0.1")
+
+  // Room
+  implementation("androidx.room:room-runtime:2.8.4")
+  ksp("androidx.room:room-compiler:2.8.4")
+
+  // Dagger Hilt
+  implementation("com.google.dagger:hilt-android:2.57.2")
+  ksp("com.google.dagger:hilt-android-compiler:2.57.2")
+  implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
 
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.lifecycle.runtime.ktx)
