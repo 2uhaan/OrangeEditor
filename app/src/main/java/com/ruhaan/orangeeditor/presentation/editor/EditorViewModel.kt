@@ -4,12 +4,9 @@ import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -26,21 +23,36 @@ import com.ruhaan.orangeeditor.domain.model.layer.Layer
 import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustment
 import com.ruhaan.orangeeditor.domain.model.layer.TextLayer
 import com.ruhaan.orangeeditor.domain.model.layer.Transform
+import com.ruhaan.orangeeditor.domain.repository.OrangeRepository
 import com.ruhaan.orangeeditor.util.EditorRenderer
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-@RequiresApi(Build.VERSION_CODES.Q)
-class EditorViewModel : ViewModel() {
+@HiltViewModel
+class EditorViewModel @Inject constructor(private val orangeRepository: OrangeRepository) :
+    ViewModel() {
 
-  private val _state = MutableStateFlow(EditorState())
-  val state = _state.asStateFlow()
+  private val _editorState = MutableStateFlow(EditorState())
+  val editorState = _editorState.asStateFlow()
+
+  val allDraft =
+      orangeRepository
+          .getAllEditorState()
+          .stateIn(
+              scope = viewModelScope,
+              started = SharingStarted.WhileSubscribed(5000),
+              initialValue = emptyList(),
+          )
 
   private val editorRender = EditorRenderer()
 
@@ -49,12 +61,12 @@ class EditorViewModel : ViewModel() {
   private val maxHistorySize = 20
 
   fun resetState() {
-    _state.update { it.copy(layers = emptyList(), selectedLayerId = null) }
+    _editorState.update { it.copy(layers = emptyList(), selectedLayerId = null) }
   }
 
   fun addLayer(layer: Layer) {
     saveSnapshot()
-    _state.update { it.copy(layers = it.layers + layer, selectedLayerId = layer.id) }
+    _editorState.update { it.copy(layers = it.layers + layer, selectedLayerId = layer.id) }
   }
 
   fun addImageLayer(
@@ -81,7 +93,7 @@ class EditorViewModel : ViewModel() {
             imageFilter = imageFilter,
             adjustment = NeutralAdjustment,
             transform = Transform(x = x, y = y, scale = scale, rotation = 0f),
-            zIndex = (_state.value.layers.maxOfOrNull { it.zIndex } ?: 0) + 1,
+            zIndex = (_editorState.value.layers.maxOfOrNull { it.zIndex } ?: 0) + 1,
             originalWidth = bitmap.width,
             originalHeight = bitmap.height,
         )
@@ -116,7 +128,7 @@ class EditorViewModel : ViewModel() {
                     scale = 1f,
                     rotation = 0f,
                 ),
-            zIndex = (_state.value.layers.maxOfOrNull { it.zIndex } ?: 0) + 1,
+            zIndex = (_editorState.value.layers.maxOfOrNull { it.zIndex } ?: 0) + 1,
             visible = true,
         )
 
@@ -124,7 +136,7 @@ class EditorViewModel : ViewModel() {
   }
 
   fun getSelectedLayer(): Layer? {
-    return _state.value.layers.firstOrNull { it.id == _state.value.selectedLayerId }
+    return _editorState.value.layers.firstOrNull { it.id == _editorState.value.selectedLayerId }
   }
 
   fun getSelectedImagerLayer(): ImageLayer? {
@@ -140,13 +152,12 @@ class EditorViewModel : ViewModel() {
   }
 
   fun updateLayer(updatedLayer: Layer) {
-    _state.update { state ->
+    _editorState.update { state ->
       state.copy(
           layers =
               state.layers.map { layer -> if (layer.id == updatedLayer.id) updatedLayer else layer }
       )
     }
-    Log.i("LOG", "${_state.value.layers}")
   }
 
   fun updateBitmapOfSelectedImageLayer(updatedBitmap: Bitmap) {
@@ -163,9 +174,7 @@ class EditorViewModel : ViewModel() {
     val selectedImageLayer = selectedLayer as? ImageLayer
     selectedImageLayer?.let {
       saveSnapshot()
-      updateLayer(
-          updatedLayer = it.copy(imageFilter = imageFilter, adjustment = NeutralAdjustment)
-      )
+      updateLayer(updatedLayer = it.copy(imageFilter = imageFilter, adjustment = NeutralAdjustment))
     }
   }
 
@@ -204,7 +213,7 @@ class EditorViewModel : ViewModel() {
 
   fun removeLayer(id: String) {
     saveSnapshot()
-    _state.update { state ->
+    _editorState.update { state ->
       state.copy(layers = state.layers.filterNot { it.id == id }, selectedLayerId = null)
     }
   }
@@ -214,11 +223,11 @@ class EditorViewModel : ViewModel() {
 
     val finalName = sanitized.ifEmpty { "Draft" }
 
-    _state.update { it.copy(fileName = finalName) }
+    _editorState.update { it.copy(fileName = finalName) }
   }
 
   private fun saveSnapshot() {
-    val currentLayers = _state.value.layers.toList()
+    val currentLayers = _editorState.value.layers.toList()
 
     undoStack.add(currentLayers)
 
@@ -240,26 +249,26 @@ class EditorViewModel : ViewModel() {
   fun undo() {
     if (!canUndo()) return
 
-    val currentLayers = _state.value.layers.toList()
+    val currentLayers = _editorState.value.layers.toList()
     redoStack.add(currentLayers)
 
     val previousLayers = undoStack.removeAt(undoStack.lastIndex)
-    _state.update { it.copy(layers = previousLayers, selectedLayerId = null) }
+    _editorState.update { it.copy(layers = previousLayers, selectedLayerId = null) }
   }
 
   fun redo() {
     if (!canRedo()) return
 
-    val currentLayers = _state.value.layers.toList()
+    val currentLayers = _editorState.value.layers.toList()
     undoStack.add(currentLayers)
 
     val nextLayers = redoStack.removeAt(redoStack.lastIndex)
-    _state.update { it.copy(layers = nextLayers, selectedLayerId = null) }
+    _editorState.update { it.copy(layers = nextLayers, selectedLayerId = null) }
   }
 
   fun exportImage(context: Context, canvasFormat: CanvasFormat, canvasScreenSize: IntSize) {
-    val currentLayers = _state.value.layers
-    val currentFileName = _state.value.fileName
+    val currentLayers = _editorState.value.layers
+    val currentFileName = _editorState.value.fileName
 
     if (currentLayers.isEmpty()) {
       Toast.makeText(context, "Nothing to export", Toast.LENGTH_SHORT).show()
@@ -329,5 +338,24 @@ class EditorViewModel : ViewModel() {
       e.printStackTrace()
       false
     }
+  }
+
+  fun saveDraft() {
+    viewModelScope.launch { orangeRepository.saveEditorState(editorState = _editorState.value) }
+  }
+
+  fun selectedDraft(editorId: String) {
+    viewModelScope.launch {
+      val draft = orangeRepository.getEditorStatById(editorId = editorId)
+      _editorState.update { draft }
+    }
+  }
+
+  fun deleteSavedDraft(editorId: String) {
+    viewModelScope.launch { orangeRepository.deleteEditorStateById(editorId = editorId) }
+  }
+
+  fun newEditorState(canvasFormat: CanvasFormat) {
+    _editorState.value = EditorState(canvasFormat = canvasFormat)
   }
 }
