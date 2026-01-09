@@ -9,12 +9,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
-import com.ruhaan.orangeeditor.domain.model.format.CanvasFormat
 import com.ruhaan.orangeeditor.presentation.crop.CropScreen
 import com.ruhaan.orangeeditor.presentation.editor.EditorScreen
 import com.ruhaan.orangeeditor.presentation.editor.EditorViewModel
@@ -24,21 +22,19 @@ import kotlinx.coroutines.delay
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    viewmodel: EditorViewModel,
     startDestination: String = Route.Home.route,
 ) {
 
+  val viewmodel: EditorViewModel = hiltViewModel()
+
   NavHost(navController = navController, startDestination = startDestination) {
-    composable(route = Route.Home.route) { HomeScreen(navController = navController) }
+    composable(route = Route.Home.route) {
+      HomeScreen(navController = navController, viewmodel = viewmodel)
+    }
 
     composable(
         route = Route.Editor.route,
-        arguments =
-            listOf(navArgument(Route.Editor.ARG_CANVAS_FORMAT) { type = NavType.StringType }),
-    ) { backStackEntry ->
-      val formatName = backStackEntry.arguments?.getString(Route.Editor.ARG_CANVAS_FORMAT)
-      val selectedFormat = formatName?.let { CanvasFormat.valueOf(it) } ?: CanvasFormat.POST
-
+    ) {
       val context = LocalContext.current
       var backPressedOnce by remember { mutableStateOf(false) }
 
@@ -65,7 +61,6 @@ fun NavGraph(
       }
 
       EditorScreen(
-          canvasFormat = selectedFormat,
           viewModel = viewmodel,
           navController = navController,
       )
