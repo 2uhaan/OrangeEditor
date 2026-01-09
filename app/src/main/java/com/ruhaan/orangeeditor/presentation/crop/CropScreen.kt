@@ -31,34 +31,36 @@ fun CropScreen(
   var cropController: CropController?
 
   if (selectedLayer is ImageLayer) {
-    cropController =
-        rememberCropController(
-            bitmap = selectedLayer.bitmap,
-            cropOptions = CropDefaults.cropOptions(handleRadius = 12.dp, touchPadding = 14.dp),
-        )
-    Scaffold { innerPadding ->
-      Column(
-          modifier = modifier.fillMaxSize().padding(paddingValues = innerPadding),
-          verticalArrangement = Arrangement.Center,
-          horizontalAlignment = Alignment.CenterHorizontally,
-      ) {
-        ImageCropper(
-            modifier = Modifier.fillMaxWidth().weight(1f).padding(24.dp),
-            cropController = cropController,
-        )
-        ActionBar(
-            onVerticalFlip = cropController::flipVertically,
-            onHorizontalFlip = cropController::flipHorizontally,
-            onAntiClockWiseRotate = cropController::rotateAntiClockwise,
-            onClockWiseRotate = cropController::rotateClockwise,
-        )
-        Button(
-            onClick = {
-              onSave(cropController.crop())
-              onNavigateBack()
-            }
+    selectedLayer.bitmap?.let {
+      cropController =
+          rememberCropController(
+              bitmap = selectedLayer.bitmap,
+              cropOptions = CropDefaults.cropOptions(handleRadius = 12.dp, touchPadding = 14.dp),
+          )
+      Scaffold { innerPadding ->
+        Column(
+            modifier = modifier.fillMaxSize().padding(paddingValues = innerPadding),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-          Text("Save")
+          ImageCropper(
+              modifier = Modifier.fillMaxWidth().weight(1f).padding(24.dp),
+              cropController = cropController,
+          )
+          ActionBar(
+              onVerticalFlip = cropController::flipVertically,
+              onHorizontalFlip = cropController::flipHorizontally,
+              onAntiClockWiseRotate = cropController::rotateAntiClockwise,
+              onClockWiseRotate = cropController::rotateClockwise,
+          )
+          Button(
+              onClick = {
+                onSave(cropController.crop())
+                onNavigateBack()
+              }
+          ) {
+            Text("Save")
+          }
         }
       }
     }
