@@ -35,6 +35,7 @@ fun HomeScreen(
     viewmodel: EditorViewModel,
     navController: NavHostController,
 ) {
+  val allDraft by viewmodel.allDraft.collectAsState()
   Column(modifier = modifier.fillMaxSize().background(BackgroundLight).padding(top = 60.dp)) {
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
       Spacer(modifier = Modifier.height(25.dp))
@@ -68,5 +69,25 @@ fun HomeScreen(
           navController.navigate(Route.Editor.route)
         },
     )
+    LazyColumn {
+      items(items = allDraft) { draft ->
+        Column(
+            modifier =
+                Modifier.padding(8.dp)
+                    .clickable(
+                        onClick = {
+                          viewmodel.selectedDraft(draft.editorId)
+                          navController.navigate(Route.Editor.route)
+                        }
+                    ),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+          Text(text = "ID: ${draft.editorId}")
+          Text(text = "Draft name : ${draft.fileName}")
+          Text(text = "Selected : ${draft.selectedLayerId}")
+          Button(onClick = { viewmodel.deleteSavedDraft(draft.editorId) }) { Text("Delete") }
+        }
+      }
+    }
   }
 }
