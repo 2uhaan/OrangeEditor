@@ -11,7 +11,7 @@ import androidx.core.graphics.withSave
 import com.ruhaan.orangeeditor.domain.model.layer.ImageFilter
 import com.ruhaan.orangeeditor.domain.model.layer.ImageLayer
 import com.ruhaan.orangeeditor.domain.model.layer.Layer
-import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustments
+import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustment
 import com.ruhaan.orangeeditor.domain.model.layer.TextLayer
 import com.ruhaan.orangeeditor.domain.model.layer.toColorMatrix
 
@@ -35,33 +35,35 @@ class EditorRenderer {
       scaleX: Float = 1f,
       scaleY: Float = 1f,
   ): Canvas {
-    canvas.withSave {
-      val t = layer.transform
-      translate(t.x * scaleX, t.y * scaleY)
-      rotate(t.rotation)
-      scale(t.scale * scaleX, t.scale * scaleY)
+    layer.bitmap?.let {
+      canvas.withSave {
+        val t = layer.transform
+        translate(t.x * scaleX, t.y * scaleY)
+        rotate(t.rotation)
+        scale(t.scale * scaleX, t.scale * scaleY)
 
-      val filter = layer.imageFilter
+        val filter = layer.imageFilter
 
-      val isApplyCustomAdjustments = layer.adjustments != NeutralAdjustments
+        val isApplyCustomAdjustments = layer.adjustment != NeutralAdjustment
 
-      val paint =
-          Paint().apply {
-            colorFilter =
-                ColorMatrixColorFilter(
-                    if (isApplyCustomAdjustments) layer.adjustments.toColorMatrix()
-                    else layer.imageFilter.colorMatrix
-                )
-          }
+        val paint =
+            Paint().apply {
+              colorFilter =
+                  ColorMatrixColorFilter(
+                      if (isApplyCustomAdjustments) layer.adjustment.toColorMatrix()
+                      else layer.imageFilter.colorMatrix
+                  )
+            }
 
-      val shouldApplyPaint = isApplyCustomAdjustments || filter != ImageFilter.NO_FILTER
+        val shouldApplyPaint = isApplyCustomAdjustments || filter != ImageFilter.NO_FILTER
 
-      drawBitmap(
-          layer.bitmap,
-          -layer.bitmap.width / 2f,
-          -layer.bitmap.height / 2f,
-          if (shouldApplyPaint) paint else null,
-      )
+        drawBitmap(
+            layer.bitmap,
+            -layer.bitmap.width / 2f,
+            -layer.bitmap.height / 2f,
+            if (shouldApplyPaint) paint else null,
+        )
+      }
     }
     return canvas
   }

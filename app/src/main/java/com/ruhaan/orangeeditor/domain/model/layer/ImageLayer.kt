@@ -4,9 +4,9 @@ import android.graphics.Bitmap
 
 data class ImageLayer(
     override val id: String,
-    val bitmap: Bitmap,
+    val bitmap: Bitmap?,
     val imageFilter: ImageFilter,
-    val adjustments: Adjustments,
+    val adjustment: Adjustment,
     val originalWidth: Int,
     val originalHeight: Int,
     override val transform: Transform,

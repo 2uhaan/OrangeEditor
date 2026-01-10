@@ -15,7 +15,7 @@ import kotlin.math.pow
  * - Tint: -100 .. +100 (0 = neutral)
  * - Hue: -180 .. +180 (0 = normal)
  */
-data class Adjustments(
+data class Adjustment(
     val saturation: Float,
     val brightness: Float,
     val contrast: Float,
@@ -25,8 +25,8 @@ data class Adjustments(
     val hue: Float,
 )
 
-val NeutralAdjustments =
-    Adjustments(
+val NeutralAdjustment =
+    Adjustment(
         saturation = 1f,
         brightness = 0f,
         contrast = 1f,
@@ -36,7 +36,7 @@ val NeutralAdjustments =
         hue = 0f,
     )
 
-fun Adjustments.toColorMatrix(): ColorMatrix {
+fun Adjustment.toColorMatrix(): ColorMatrix {
 
   // ---------- Clamp helpers ----------
   fun clamp(v: Float, min : Float, max: Float) = v.coerceIn(min, max)
