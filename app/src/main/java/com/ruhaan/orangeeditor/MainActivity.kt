@@ -10,18 +10,19 @@ import androidx.navigation.compose.rememberNavController
 import com.ruhaan.orangeeditor.presentation.editor.EditorViewModel
 import com.ruhaan.orangeeditor.presentation.navigation.NavGraph
 import com.ruhaan.orangeeditor.presentation.theme.OrangeEditorTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
-    val viewmodel: EditorViewModel by viewModels()
-    setContent { OrangeEditorTheme { OrangeEditorApp(viewmodel = viewmodel) } }
+    setContent { OrangeEditorTheme { OrangeEditorApp() } }
   }
 }
 
 @Composable
-fun OrangeEditorApp(viewmodel: EditorViewModel) {
+fun OrangeEditorApp() {
   val navController = rememberNavController()
-  NavGraph(navController = navController, viewmodel = viewmodel)
+  NavGraph(navController = navController)
 }

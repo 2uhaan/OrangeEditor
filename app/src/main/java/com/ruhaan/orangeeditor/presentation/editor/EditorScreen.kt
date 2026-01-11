@@ -1,7 +1,5 @@
 package com.ruhaan.orangeeditor.presentation.editor
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,8 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ruhaan.orangeeditor.domain.model.format.CanvasFormat
-import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustments
+import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustment
 import com.ruhaan.orangeeditor.presentation.editor.components.AddTextSheet
 import com.ruhaan.orangeeditor.presentation.editor.components.AdjustmentsSheet
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorBottomBar
@@ -44,16 +42,15 @@ import com.ruhaan.orangeeditor.presentation.editor.components.SelectedLayerGestu
 import com.ruhaan.orangeeditor.presentation.navigation.Route
 import com.ruhaan.orangeeditor.presentation.theme.CanvasOrange
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun EditorScreen(
     modifier: Modifier = Modifier,
     viewModel: EditorViewModel,
-    canvasFormat: CanvasFormat,
     navController: NavHostController,
 ) {
   // ViewModel states
-  val state by viewModel.state.collectAsState()
+  val editorState by viewModel.editorState.collectAsState()
+  val canvasFormat by remember { derivedStateOf { editorState.canvasFormat } }
   var currentSelectedTextLayer by remember { mutableStateOf(viewModel.getSelectedTextLayer()) }
   var currentSelectedImageLayer by remember { mutableStateOf(viewModel.getSelectedImagerLayer()) }
   val context = LocalContext.current
@@ -66,7 +63,7 @@ fun EditorScreen(
   var showFileNameSheet by remember { mutableStateOf(false) }
   var showPositionSheet by remember { mutableStateOf(false) }
 
-  LaunchedEffect(state) {
+  LaunchedEffect(editorState) {
     currentSelectedTextLayer = viewModel.getSelectedTextLayer()
     currentSelectedImageLayer = viewModel.getSelectedImagerLayer()
   }
@@ -105,14 +102,14 @@ fun EditorScreen(
   if (showAdjustmentsSheet) {
     AdjustmentsSheet(
         onDismissRequest = { showAdjustmentsSheet = false },
-        adjustments = currentSelectedImageLayer?.adjustments ?: NeutralAdjustments,
+        adjustment = currentSelectedImageLayer?.adjustment ?: NeutralAdjustment,
         onAdjustmentsConfirm = viewModel::updateAdjustmentsOfSelectedImageLayer,
     )
   }
 
   if (showFileNameSheet) {
     FileNameSheet(
-        currentFileName = state.fileName,
+        currentFileName = editorState.fileName,
         onDismissRequest = { showFileNameSheet = false },
         onSave = viewModel::updateFileName,
     )
@@ -134,15 +131,19 @@ fun EditorScreen(
         Box(modifier = Modifier.background(color = CanvasOrange)) {
           EditorTopBar(
               modifier = Modifier.fillMaxWidth().statusBarsPadding(),
-              fileName = state.fileName,
+              fileName = editorState.fileName,
               canUndo = viewModel.canUndo(),
               canRedo = viewModel.canRedo(),
-              canDelete = state.selectedLayerId != null,
+              canDelete = editorState.selectedLayerId != null,
               onBackClick = { navController.popBackStack() },
               onFileNameClick = { showFileNameSheet = true },
               onUndoClick = { viewModel.undo() },
               onRedoClick = { viewModel.redo() },
-              onDeleteClick = { state.selectedLayerId?.let { viewModel.removeLayer(it) } },
+              onDeleteClick = { editorState.selectedLayerId?.let { viewModel.removeLayer(it) } },
+              onDraftClick = {
+                viewModel.saveDraft()
+                navController.popBackStack()
+              },
               onExportClick = { viewModel.exportImage(context, canvasFormat, canvasSize) },
           )
         }
@@ -183,12 +184,12 @@ fun EditorScreen(
         contentAlignment = Alignment.Center,
     ) {
       EditorCanvas(
-          state = state,
+          state = editorState,
           canvasFormat = canvasFormat,
           onCanvasSize = { size -> canvasSize = size },
       )
       SelectedLayerGestureLayer(
-          state = state,
+          state = editorState,
           onUpdateLayer = viewModel::updateLayer,
       )
     }

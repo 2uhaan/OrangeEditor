@@ -33,6 +33,7 @@ fun EditorTopBar(
     onUndoClick: () -> Unit,
     onRedoClick: () -> Unit,
     onDeleteClick: () -> Unit,
+    onDraftClick : () -> Unit,
     onExportClick: () -> Unit,
 ) {
   Row(
@@ -93,6 +94,13 @@ fun EditorTopBar(
         enabled = canDelete,
     ) {
       onDeleteClick()
+    }
+    LargeIconButton(
+        modifier = Modifier.weight(1f),
+        iconId = R.drawable.ic_text,
+        contentDescription = "Draft",
+    ) {
+      onDraftClick()
     }
 
     Button(
