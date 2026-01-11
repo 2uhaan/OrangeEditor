@@ -30,4 +30,5 @@ data class ImageLayerEntity(
     val imageFilter: ImageFilter,
     val originalWidth: Int,
     val originalHeight: Int,
+    val displayName: String,
 )

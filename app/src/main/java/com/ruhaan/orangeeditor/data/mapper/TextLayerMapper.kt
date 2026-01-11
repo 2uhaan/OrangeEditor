@@ -19,12 +19,14 @@ fun TextLayerEntity.toDomain(): TextLayer {
       transform = base.transform,
       zIndex = base.zIndex,
       visible = base.visible,
+      displayName = displayName,
   )
 }
 
 fun TextLayer.toEntity(editorId: String): TextLayerEntity {
   return TextLayerEntity(
       id = id,
+      displayName = displayName,
       base = LayerBase(transform, zIndex, visible),
       editorId = editorId,
       text = text,

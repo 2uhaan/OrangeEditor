@@ -117,8 +117,8 @@ fun EditorScreen(
 
   if (showPositionSheet) {
     LayerPositionSheet(
-        layers = state.layers,
-        selectedLayerId = state.selectedLayerId,
+        layers = editorState.layers,
+        selectedLayerId = editorState.selectedLayerId,
         onLayerSelected = { layerId -> viewModel.moveLayerToTop(layerId) },
         onMoveUp = viewModel::moveLayerUp,
         onMoveDown = viewModel::moveLayerDown,

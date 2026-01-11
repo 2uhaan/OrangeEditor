@@ -4,10 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.rememberNavController
-import com.ruhaan.orangeeditor.presentation.editor.EditorViewModel
 import com.ruhaan.orangeeditor.presentation.navigation.NavGraph
 import com.ruhaan.orangeeditor.presentation.theme.OrangeEditorTheme
 import dagger.hilt.android.AndroidEntryPoint
