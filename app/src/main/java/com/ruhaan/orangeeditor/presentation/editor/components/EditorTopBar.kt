@@ -34,7 +34,6 @@ fun EditorTopBar(
     onRedoClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onDraftClick: () -> Unit,
-    onExportClick: () -> Unit,
 ) {
   Row(
       modifier = modifier.padding(end = 15.dp, bottom = 5.dp),

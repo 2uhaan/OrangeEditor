@@ -31,6 +31,7 @@ fun EditorBottomBar(
     onAdjustmentsClick: () -> Unit,
     onCropClick: () -> Unit,
     onPositionClick: () -> Unit,
+    onExportClick: () -> Unit,
 ) {
   val context = LocalContext.current
   val scope = rememberCoroutineScope()
@@ -116,6 +117,16 @@ fun EditorBottomBar(
           label = "Position",
       ) {
         onPositionClick()
+      }
+    }
+    item {
+      LargeIconButton(
+          modifier = Modifier.widthIn(min = 80.dp),
+          iconId = R.drawable.ic_export, // ← Use your export icon
+          contentDescription = "export image",
+          label = "Export",
+      ) {
+        onExportClick()
       }
     }
   }
