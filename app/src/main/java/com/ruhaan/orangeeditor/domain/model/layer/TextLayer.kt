@@ -6,6 +6,7 @@ import androidx.compose.ui.text.font.FontWeight
 
 data class TextLayer(
     override val id: String,
+    val displayName: String,
     val text: String,
     val color: Color,
     val fontSizeInPx: Int,

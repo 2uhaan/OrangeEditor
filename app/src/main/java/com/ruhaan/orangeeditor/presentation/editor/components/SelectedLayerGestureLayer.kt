@@ -19,7 +19,9 @@ fun SelectedLayerGestureLayer(
     state: EditorState,
     onUpdateLayer: (Layer) -> Unit,
 ) {
-  val selectedLayer = state.layers.firstOrNull { it.id == state.selectedLayerId } ?: return
+  // Read selectedLayerId so this composable recomposes when it changes
+  val selectedLayerId = state.selectedLayerId
+  val selectedLayer = state.layers.firstOrNull { it.id == selectedLayerId } ?: return
 
   val currentLayer by rememberUpdatedState(selectedLayer)
 

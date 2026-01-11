@@ -67,9 +67,8 @@ fun EditorCanvas(
     ) {
       Surface(shadowElevation = 2.dp, color = Color.White) {
         Canvas(modifier = Modifier.size(width = canvasWidth, height = canvasHeight)) {
-          drawIntoCanvas { composeCanvas ->
-            renderer.draw(composeCanvas.nativeCanvas, state.layers)
-          }
+          val layers = state.layers // to update after reordering
+          drawIntoCanvas { composeCanvas -> renderer.draw(composeCanvas.nativeCanvas, layers) }
         }
       }
     }

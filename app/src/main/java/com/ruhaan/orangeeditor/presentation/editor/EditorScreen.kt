@@ -37,6 +37,7 @@ import com.ruhaan.orangeeditor.presentation.editor.components.EditorCanvas
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorTopBar
 import com.ruhaan.orangeeditor.presentation.editor.components.FileNameSheet
 import com.ruhaan.orangeeditor.presentation.editor.components.FilterRow
+import com.ruhaan.orangeeditor.presentation.editor.components.LayerPositionSheet
 import com.ruhaan.orangeeditor.presentation.editor.components.SelectedLayerGestureLayer
 import com.ruhaan.orangeeditor.presentation.navigation.Route
 import com.ruhaan.orangeeditor.presentation.theme.CanvasOrange
@@ -60,6 +61,7 @@ fun EditorScreen(
   var showImageFilters by remember { mutableStateOf(false) }
   var showAdjustmentsSheet by remember { mutableStateOf(false) }
   var showFileNameSheet by remember { mutableStateOf(false) }
+  var showPositionSheet by remember { mutableStateOf(false) }
 
   LaunchedEffect(editorState) {
     currentSelectedTextLayer = viewModel.getSelectedTextLayer()
@@ -113,6 +115,17 @@ fun EditorScreen(
     )
   }
 
+  if (showPositionSheet) {
+    LayerPositionSheet(
+        layers = state.layers,
+        selectedLayerId = state.selectedLayerId,
+        onLayerSelected = { layerId -> viewModel.moveLayerToTop(layerId) },
+        onMoveUp = viewModel::moveLayerUp,
+        onMoveDown = viewModel::moveLayerDown,
+        onDismissRequest = { showPositionSheet = false },
+    )
+  }
+
   Scaffold(
       topBar = {
         Box(modifier = Modifier.background(color = CanvasOrange)) {
@@ -160,6 +173,7 @@ fun EditorScreen(
               onFilterClick = { showImageFilters = !showImageFilters },
               onAdjustmentsClick = { showAdjustmentsSheet = true },
               onCropClick = { navController.navigate(Route.CropScreen.route) },
+              onPositionClick = { showPositionSheet = true },
           )
         }
       },

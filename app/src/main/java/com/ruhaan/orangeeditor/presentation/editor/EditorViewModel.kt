@@ -60,6 +60,9 @@ class EditorViewModel @Inject constructor(private val orangeRepository: OrangeRe
   private val redoStack = mutableListOf<List<Layer>>()
   private val maxHistorySize = 20
 
+  private var nextTextId = 1
+  private var nextImageId = 1
+
   fun resetState() {
     _editorState.update { it.copy(layers = emptyList(), selectedLayerId = null) }
   }
@@ -82,13 +85,14 @@ class EditorViewModel @Inject constructor(private val orangeRepository: OrangeRe
             1f,
         ) * 0.9f
 
-    // Why? because we want to place image at center of canvas when user import images.
+    // to place image at center of canvas when user import images.
     val x = canvasWidthInPx / 2f
     val y = canvasHeightInPx / 2f
 
     val layer =
         ImageLayer(
             id = UUID.randomUUID().toString(),
+            displayName = "Image ${nextImageId++}",
             bitmap = bitmap,
             imageFilter = imageFilter,
             adjustment = NeutralAdjustment,
@@ -116,6 +120,7 @@ class EditorViewModel @Inject constructor(private val orangeRepository: OrangeRe
     val layer =
         TextLayer(
             id = UUID.randomUUID().toString(),
+            displayName = "Text ${nextTextId++}",
             text = text,
             color = color,
             fontSizeInPx = fontSizeInPx,
@@ -214,7 +219,12 @@ class EditorViewModel @Inject constructor(private val orangeRepository: OrangeRe
   fun removeLayer(id: String) {
     saveSnapshot()
     _editorState.update { state ->
-      state.copy(layers = state.layers.filterNot { it.id == id }, selectedLayerId = null)
+      val remainingLayers = state.layers.filterNot { it.id == id }
+
+      // Auto-select the new top layer (last in list)
+      val newSelectedId = remainingLayers.lastOrNull()?.id
+
+      state.copy(layers = remainingLayers, selectedLayerId = newSelectedId)
     }
   }
 
@@ -253,7 +263,11 @@ class EditorViewModel @Inject constructor(private val orangeRepository: OrangeRe
     redoStack.add(currentLayers)
 
     val previousLayers = undoStack.removeAt(undoStack.lastIndex)
-    _editorState.update { it.copy(layers = previousLayers, selectedLayerId = null) }
+
+    // Auto-select the top layer (last in list)
+    val newSelectedId = previousLayers.lastOrNull()?.id
+
+    _editorState.update { it.copy(layers = previousLayers, selectedLayerId = newSelectedId) }
   }
 
   fun redo() {
@@ -263,7 +277,66 @@ class EditorViewModel @Inject constructor(private val orangeRepository: OrangeRe
     undoStack.add(currentLayers)
 
     val nextLayers = redoStack.removeAt(redoStack.lastIndex)
-    _editorState.update { it.copy(layers = nextLayers, selectedLayerId = null) }
+
+    // Auto-select the top layer (last in list)
+    val newSelectedId = nextLayers.lastOrNull()?.id
+
+    _editorState.update { it.copy(layers = nextLayers, selectedLayerId = newSelectedId) }
+  }
+
+  private fun reassignZIndex(layers: List<Layer>): List<Layer> {
+    return layers.mapIndexed { index, layer ->
+      when (layer) {
+        is TextLayer -> layer.copy(zIndex = index)
+        is ImageLayer -> layer.copy(zIndex = index)
+      }
+    }
+  }
+
+  fun moveLayerUp(layerId: String) {
+    val layers = _editorState.value.layers
+    val index = layers.indexOfFirst { it.id == layerId }
+    if (index <= 0 || index >= layers.size) return
+
+    saveSnapshot()
+    val newLayers = layers.toMutableList()
+    newLayers.swap(index, index - 1)
+    val reindexed = reassignZIndex(newLayers)
+    val newSelectedId = reindexed.lastOrNull()?.id // ← Select the new top layer
+    _editorState.update { it.copy(layers = reindexed, selectedLayerId = newSelectedId) }
+  }
+
+  fun moveLayerDown(layerId: String) {
+    val layers = _editorState.value.layers
+    val index = layers.indexOfFirst { it.id == layerId }
+    if (index < 0 || index >= layers.size - 1) return
+
+    saveSnapshot()
+    val newLayers = layers.toMutableList()
+    newLayers.swap(index, index + 1)
+    val reindexed = reassignZIndex(newLayers)
+    val newSelectedId = reindexed.lastOrNull()?.id // ← Select the new top layer
+    _editorState.update { it.copy(layers = reindexed, selectedLayerId = newSelectedId) }
+  }
+
+  fun moveLayerToTop(layerId: String) {
+    val layers = _editorState.value.layers
+    val index = layers.indexOfFirst { it.id == layerId }
+    if (index < 0 || index == layers.size - 1) return
+
+    saveSnapshot()
+    val newLayers = layers.toMutableList()
+    val layer = newLayers.removeAt(index)
+    newLayers.add(layer)
+    val reindexed = reassignZIndex(newLayers)
+    val newSelectedId = reindexed.lastOrNull()?.id // ← Select the new top layer
+    _editorState.update { it.copy(layers = reindexed, selectedLayerId = newSelectedId) }
+  }
+
+  private fun MutableList<Layer>.swap(i: Int, j: Int) {
+    val temp = this[i]
+    this[i] = this[j]
+    this[j] = temp
   }
 
   fun exportImage(context: Context, canvasFormat: CanvasFormat, canvasScreenSize: IntSize) {
