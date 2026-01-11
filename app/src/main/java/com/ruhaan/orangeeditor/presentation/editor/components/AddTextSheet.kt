@@ -1,6 +1,5 @@
 package com.ruhaan.orangeeditor.presentation.editor.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,7 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderState
 import androidx.compose.material3.Text
@@ -119,14 +117,6 @@ fun AddTextSheet(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-          OutlinedButton(
-              onClick = { reset() },
-              border = BorderStroke(width = 2.dp, color = CanvasOrange),
-          ) {
-            Text(
-                text = "New text",
-            )
-          }
           Button(
               onClick = {
                 onTextAdd(

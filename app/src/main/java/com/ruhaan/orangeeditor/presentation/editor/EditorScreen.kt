@@ -58,6 +58,7 @@ fun EditorScreen(
   // Local states
   var canvasSize by remember { mutableStateOf(IntSize.Zero) }
   var showAddTextSheet by remember { mutableStateOf(false) }
+  var isAddingNewText by remember { mutableStateOf(true) } // true = add, false = edit
   var showImageFilters by remember { mutableStateOf(false) }
   var showAdjustmentsSheet by remember { mutableStateOf(false) }
   var showFileNameSheet by remember { mutableStateOf(false) }
@@ -75,31 +76,32 @@ fun EditorScreen(
   if (showAddTextSheet)
       AddTextSheet(
           onDismissRequest = { showAddTextSheet = false },
-          isNew = currentSelectedTextLayer == null,
+          isNew = isAddingNewText,
           prevInputText = currentSelectedTextLayer?.text ?: "",
           prevFontWeight = currentSelectedTextLayer?.fontWeight ?: FontWeight.Normal,
           prevFontStyle = currentSelectedTextLayer?.fontStyle ?: FontStyle.Normal,
           prevFontSize = currentSelectedTextLayer?.fontSizeInPx ?: 80,
           prevColor = currentSelectedTextLayer?.color ?: Color.Black,
           onTextAdd = { isNewText, text, fontSize, fontColor, fontWeight, fontStyle ->
-            if (isNewText || currentSelectedTextLayer == null)
-                viewModel.addTextLayer(
-                    text = text,
-                    fontSizeInPx = fontSize,
-                    color = fontColor,
-                    fontWeight = fontWeight,
-                    fontStyle = fontStyle,
-                    canvasWidthInPx = canvasSize.width.toFloat(),
-                    canvasHeightInPx = canvasSize.height.toFloat(),
-                )
-            else
-                viewModel.updateSelectedTextLayer(
-                    text = text,
-                    fontSizeInPx = fontSize,
-                    fontColor = fontColor,
-                    fontWeight = fontWeight,
-                    fontStyle = fontStyle,
-                )
+            if (isNewText || currentSelectedTextLayer == null) {
+              viewModel.addTextLayer(
+                  text = text,
+                  fontSizeInPx = fontSize,
+                  color = fontColor,
+                  fontWeight = fontWeight,
+                  fontStyle = fontStyle,
+                  canvasWidthInPx = canvasSize.width.toFloat(),
+                  canvasHeightInPx = canvasSize.height.toFloat(),
+              )
+            } else {
+              viewModel.updateSelectedTextLayer(
+                  text = text,
+                  fontSizeInPx = fontSize,
+                  fontColor = fontColor,
+                  fontWeight = fontWeight,
+                  fontStyle = fontStyle,
+              )
+            }
           },
       )
 
@@ -173,7 +175,17 @@ fun EditorScreen(
                     canvasHeightInPx = canvasSize.height.toFloat(),
                 )
               },
-              onTextClick = { showAddTextSheet = true },
+              onAddTextClick = {
+                isAddingNewText = true
+                showAddTextSheet = true
+              },
+              onEditTextClick = {
+                if (currentSelectedTextLayer != null) {
+                  isAddingNewText = false
+                  showAddTextSheet = true
+                }
+                // Else: (button disabled)
+              },
               onFilterClick = { showImageFilters = !showImageFilters },
               onAdjustmentsClick = { showAdjustmentsSheet = true },
               onCropClick = { navController.navigate(Route.CropScreen.route) },
@@ -200,3 +212,36 @@ fun EditorScreen(
     }
   }
 }
+
+// Old Text Botton.
+
+//  if (showAddTextSheet)
+//      AddTextSheet(
+//          onDismissRequest = { showAddTextSheet = false },
+//          isNew = currentSelectedTextLayer == null,
+//          prevInputText = currentSelectedTextLayer?.text ?: "",
+//          prevFontWeight = currentSelectedTextLayer?.fontWeight ?: FontWeight.Normal,
+//          prevFontStyle = currentSelectedTextLayer?.fontStyle ?: FontStyle.Normal,
+//          prevFontSize = currentSelectedTextLayer?.fontSizeInPx ?: 80,
+//          prevColor = currentSelectedTextLayer?.color ?: Color.Black,
+//          onTextAdd = { isNewText, text, fontSize, fontColor, fontWeight, fontStyle ->
+//            if (isNewText || currentSelectedTextLayer == null)
+//                viewModel.addTextLayer(
+//                    text = text,
+//                    fontSizeInPx = fontSize,
+//                    color = fontColor,
+//                    fontWeight = fontWeight,
+//                    fontStyle = fontStyle,
+//                    canvasWidthInPx = canvasSize.width.toFloat(),
+//                    canvasHeightInPx = canvasSize.height.toFloat(),
+//                )
+//            else
+//                viewModel.updateSelectedTextLayer(
+//                    text = text,
+//                    fontSizeInPx = fontSize,
+//                    fontColor = fontColor,
+//                    fontWeight = fontWeight,
+//                    fontStyle = fontStyle,
+//                )
+//          },
+//      )

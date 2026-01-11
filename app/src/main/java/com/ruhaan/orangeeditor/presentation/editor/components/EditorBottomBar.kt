@@ -28,7 +28,8 @@ fun EditorBottomBar(
     modifier: Modifier = Modifier,
     mode: BottomBarMode,
     onImageImportClick: (Bitmap) -> Unit,
-    onTextClick: () -> Unit,
+    onAddTextClick: () -> Unit,
+    onEditTextClick: () -> Unit,
     onFilterClick: () -> Unit,
     onAdjustmentsClick: () -> Unit,
     onCropClick: () -> Unit,
@@ -73,10 +74,23 @@ fun EditorBottomBar(
       LargeIconButton(
           modifier = Modifier.widthIn(min = 80.dp),
           iconId = R.drawable.ic_text,
-          contentDescription = "text",
-          label = "Text",
+          contentDescription = "Add text",
+          label = "Add Text",
       ) {
-        onTextClick()
+        onAddTextClick()
+      }
+    }
+
+    if (mode == BottomBarMode.TextLayerSelected) {
+      item {
+        LargeIconButton(
+            modifier = Modifier.widthIn(min = 80.dp),
+            iconId = R.drawable.ic_edit_text,
+            contentDescription = "Edit text",
+            label = "Edit Text",
+        ) {
+          onEditTextClick()
+        }
       }
     }
 
@@ -157,7 +171,6 @@ suspend fun loadBitmapFromUri(
         null
       }
     }
-
 
 /*
 
