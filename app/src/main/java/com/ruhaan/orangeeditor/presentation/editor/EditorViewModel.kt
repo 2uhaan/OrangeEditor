@@ -24,6 +24,7 @@ import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustment
 import com.ruhaan.orangeeditor.domain.model.layer.TextLayer
 import com.ruhaan.orangeeditor.domain.model.layer.Transform
 import com.ruhaan.orangeeditor.domain.repository.OrangeRepository
+import com.ruhaan.orangeeditor.util.BottomBarMode
 import com.ruhaan.orangeeditor.util.EditorRenderer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -337,6 +338,15 @@ class EditorViewModel @Inject constructor(private val orangeRepository: OrangeRe
     val temp = this[i]
     this[i] = this[j]
     this[j] = temp
+  }
+
+  fun getBottomBarMode(): BottomBarMode {
+    val selectedLayer = getSelectedLayer()
+    return when (selectedLayer) {
+      is TextLayer -> BottomBarMode.TextLayerSelected
+      is ImageLayer -> BottomBarMode.ImageLayerSelected
+      else -> BottomBarMode.Primary
+    }
   }
 
   fun exportImage(context: Context, canvasFormat: CanvasFormat, canvasScreenSize: IntSize) {

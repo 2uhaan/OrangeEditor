@@ -63,6 +63,10 @@ fun EditorScreen(
   var showFileNameSheet by remember { mutableStateOf(false) }
   var showPositionSheet by remember { mutableStateOf(false) }
 
+  // Compute current bottom bar mode
+  val bottomBarMode by
+      remember(editorState.selectedLayerId) { derivedStateOf { viewModel.getBottomBarMode() } }
+
   LaunchedEffect(editorState) {
     currentSelectedTextLayer = viewModel.getSelectedTextLayer()
     currentSelectedImageLayer = viewModel.getSelectedImagerLayer()
@@ -161,6 +165,7 @@ fun EditorScreen(
           Spacer(modifier = Modifier.height(height = 4.dp))
           EditorBottomBar(
               modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).navigationBarsPadding(),
+              mode = bottomBarMode,
               onImageImportClick = { loadedBitmap ->
                 viewModel.addImageLayer(
                     bitmap = loadedBitmap,
