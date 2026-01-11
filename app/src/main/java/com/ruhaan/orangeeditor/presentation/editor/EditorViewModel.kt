@@ -30,6 +30,7 @@ import com.ruhaan.orangeeditor.util.EditorRenderer
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -59,10 +60,6 @@ class EditorViewModel : ViewModel() {
     _state.update { it.copy(layers = it.layers + layer, selectedLayerId = layer.id) }
   }
 
-  fun selectLayer(layerId: String?) {
-    _state.update { it.copy(selectedLayerId = layerId) }
-  }
-
   fun addImageLayer(
       bitmap: Bitmap,
       imageFilter: ImageFilter = ImageFilter.NO_FILTER,
@@ -76,15 +73,14 @@ class EditorViewModel : ViewModel() {
             1f,
         ) * 0.9f
 
-    // Why? because we want to place image at center of canvas when user import images.
+    // to place image at center of canvas when user import images.
     val x = canvasWidthInPx / 2f
     val y = canvasHeightInPx / 2f
 
-    val id = "image_${nextImageId++}" // ← Changed: image_1, image_2, ...
-
     val layer =
         ImageLayer(
-            id = id,
+            id = UUID.randomUUID().toString(),
+            displayName = "Image ${nextImageId++}",
             bitmap = bitmap,
             imageFilter = imageFilter,
             adjustments = NeutralAdjustments,
@@ -109,11 +105,10 @@ class EditorViewModel : ViewModel() {
     val x = canvasWidthInPx / 2f
     val y = canvasHeightInPx / 2f
 
-    val id = "text_${nextTextId++}" // ← Changed: text_1, text_2, ...
-
     val layer =
         TextLayer(
-            id = id,
+            id = UUID.randomUUID().toString(),
+            displayName = "Text ${nextTextId++}",
             text = text,
             color = color,
             fontSizeInPx = fontSizeInPx,

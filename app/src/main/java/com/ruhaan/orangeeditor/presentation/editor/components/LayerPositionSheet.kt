@@ -29,7 +29,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.ruhaan.orangeeditor.R
+import com.ruhaan.orangeeditor.domain.model.layer.ImageLayer
 import com.ruhaan.orangeeditor.domain.model.layer.Layer
+import com.ruhaan.orangeeditor.domain.model.layer.TextLayer
 import com.ruhaan.orangeeditor.presentation.theme.CanvasOrange
 import com.ruhaan.orangeeditor.presentation.theme.Typography
 
@@ -107,12 +109,10 @@ private fun LayerPositionItem(
 ) {
   val shape = RoundedCornerShape(8.dp)
 
-  // Generate display name: Text_1, Image_1, etc.
   val layerName =
-      when {
-        layer.id.startsWith("text_") -> "Text_${layer.id.substringAfter("text_")}"
-        layer.id.startsWith("image_") -> "Image_${layer.id.substringAfter("image_")}"
-        else -> layer.id
+      when (layer) {
+        is TextLayer -> layer.displayName
+        is ImageLayer -> layer.displayName
       }
 
   Row(
