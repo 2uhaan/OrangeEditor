@@ -30,4 +30,5 @@ data class TextLayerEntity(
     val fontWeightValue: Int,
     /** This only support only Normal(0) and Italic(1). */
     val fontStyleValue: Int,
+    val displayName: String,
 )

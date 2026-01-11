@@ -8,6 +8,7 @@ import com.ruhaan.orangeeditor.domain.model.layer.ImageLayer
 fun ImageLayerEntity.toDomain(bitmap: Bitmap?): ImageLayer {
   return ImageLayer(
       id = id,
+      displayName = displayName,
       bitmap = bitmap,
       imageFilter = imageFilter,
       adjustment = adjustment,
@@ -29,5 +30,6 @@ fun ImageLayer.toEntity(editorId: String, bitmapPath: String): ImageLayerEntity 
       imageFilter = imageFilter,
       originalWidth = originalWidth,
       originalHeight = originalHeight,
+      displayName = displayName,  // ← Add this
   )
 }
