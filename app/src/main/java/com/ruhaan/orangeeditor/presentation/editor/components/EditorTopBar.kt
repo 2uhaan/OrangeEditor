@@ -33,7 +33,6 @@ fun EditorTopBar(
     onUndoClick: () -> Unit,
     onRedoClick: () -> Unit,
     onDeleteClick: () -> Unit,
-    onExportClick: () -> Unit,
 ) {
   Row(
       modifier = modifier.padding(end = 15.dp, bottom = 5.dp),
@@ -96,10 +95,10 @@ fun EditorTopBar(
     }
 
     Button(
-        onClick = onExportClick,
+        onClick = {},
         colors = ButtonDefaults.buttonColors().copy(containerColor = Color.White),
     ) {
-      Text(text = "Export", style = Typography.titleSmall)
+      Text(text = "Save", style = Typography.titleSmall)
     }
   }
 }

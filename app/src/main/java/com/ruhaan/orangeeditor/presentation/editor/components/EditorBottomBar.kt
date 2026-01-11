@@ -27,6 +27,7 @@ fun EditorBottomBar(
     onAdjustmentsClick: () -> Unit,
     onCropClick: () -> Unit,
     onPositionClick: () -> Unit,
+    onExportClick: () -> Unit,
 ) {
   val context = LocalContext.current
 
@@ -111,6 +112,16 @@ fun EditorBottomBar(
         onPositionClick()
       }
     }
+      item {
+          LargeIconButton(
+              modifier = Modifier.widthIn(min = 80.dp),
+              iconId = R.drawable.ic_export,
+              contentDescription = "export image",
+              label = "Export",
+          ) {
+              onExportClick()
+          }
+      }
   }
 }
 

@@ -143,7 +143,6 @@ fun EditorScreen(
               onUndoClick = { viewModel.undo() },
               onRedoClick = { viewModel.redo() },
               onDeleteClick = { state.selectedLayerId?.let { viewModel.removeLayer(it) } },
-              onExportClick = { viewModel.exportImage(context, canvasFormat, canvasSize) },
           )
         }
       },
@@ -173,6 +172,7 @@ fun EditorScreen(
               onAdjustmentsClick = { showAdjustmentsSheet = true },
               onCropClick = { navController.navigate(Route.CropScreen.route) },
               onPositionClick = { showPositionSheet = true },
+              onExportClick = { viewModel.exportImage(context, canvasFormat, canvasSize) },
           )
         }
       },
