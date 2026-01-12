@@ -2,10 +2,6 @@ package com.ruhaan.orangeeditor.presentation.editor
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.net.Uri
-import android.os.Environment
-import android.provider.MediaStore
 import android.widget.Toast
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
@@ -34,7 +30,6 @@ import java.util.Locale
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -66,7 +61,7 @@ constructor(private val orangeRepository: OrangeRepository, private val storage:
   private var nextImageId = 1
 
   private val _exportResult = MutableStateFlow<ExportResult>(ExportResult.Idle)
-  val exportResult: StateFlow<ExportResult> = _exportResult.asStateFlow()
+  val exportResult = _exportResult.asStateFlow()
 
   fun resetState() {
     _editorState.update { it.copy(layers = emptyList(), selectedLayerId = null) }
@@ -366,18 +361,12 @@ constructor(private val orangeRepository: OrangeRepository, private val storage:
               canvasScreenSize = canvasScreenSize,
           )
 
-      val saved = storage.saveBitmapToDownloads(context, bitmapFromLayer, fileName)
+      val savedUri = storage.saveBitmapToDownloads(context, bitmapFromLayer, fileName)
       bitmapFromLayer.recycle()
 
-      Toast.makeText(
-              context,
-              if (saved) "Exported successfully!" else "Export failed",
-              Toast.LENGTH_LONG,
-          )
-          .show()
-
-      _exportResult.value = ExportResult.Success(savedUri)
-
+      if (savedUri != null) {
+        _exportResult.value = ExportResult.Success(savedUri)
+      }
     } catch (e: Exception) {
       e.printStackTrace()
       _exportResult.value = ExportResult.Error("Export failed: ${e.message}")

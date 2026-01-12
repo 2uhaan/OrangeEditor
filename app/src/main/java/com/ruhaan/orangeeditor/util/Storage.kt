@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
+import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Toast
@@ -81,7 +82,7 @@ class Storage(private val context: Context, private val editorRenderer: EditorRe
     return exportBitmap
   }
 
-  fun saveBitmapToDownloads(context: Context, bitmap: Bitmap, fileName: String): Boolean {
+  fun saveBitmapToDownloads(context: Context, bitmap: Bitmap, fileName: String): Uri? {
     return try {
       val resolver = context.contentResolver
 
@@ -101,11 +102,11 @@ class Storage(private val context: Context, private val editorRenderer: EditorRe
         resolver.openOutputStream(uri)?.use { outputStream ->
           bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
         }
-        true
-      } ?: false
+      }
+      imageUri
     } catch (e: Exception) {
       e.printStackTrace()
-      false
+      null
     }
   }
 }
