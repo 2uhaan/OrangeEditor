@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.ruhaan.orangeeditor.data.converter.Converters
 import com.ruhaan.orangeeditor.data.dao.EditorStateDao
 import com.ruhaan.orangeeditor.data.dao.ImageLayerDao
 import com.ruhaan.orangeeditor.data.dao.TextLayerDao
@@ -17,6 +19,7 @@ import com.ruhaan.orangeeditor.data.entity.TextLayerEntity
     version = 1,
     exportSchema = false,
 )
+@TypeConverters(Converters::class)
 abstract class OrangeDatabase : RoomDatabase() {
 
   abstract fun editorStateDao(): EditorStateDao

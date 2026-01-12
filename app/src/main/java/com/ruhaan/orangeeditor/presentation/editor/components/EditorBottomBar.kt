@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.ruhaan.orangeeditor.Constant.MAX_DIMENSION
 import com.ruhaan.orangeeditor.R
 import com.ruhaan.orangeeditor.presentation.components.LargeIconButton
 import com.ruhaan.orangeeditor.util.BottomBarMode
@@ -35,6 +36,7 @@ fun EditorBottomBar(
     onCropClick: () -> Unit,
     onPositionClick: () -> Unit,
     onExportClick: () -> Unit,
+    onImageLoading: (Boolean) -> Unit,
 ) {
   val context = LocalContext.current
   val scope = rememberCoroutineScope()
@@ -44,7 +46,8 @@ fun EditorBottomBar(
         ->
         if (uri != null) {
           scope.launch {
-            val bitmap = loadBitmapFromUri(context, uri)
+            onImageLoading(true)
+            val bitmap = loadBitmapFromUri(context, uri, onImageLoading)
             bitmap?.let { onImageImportClick(it) }
           }
         }
@@ -156,21 +159,44 @@ fun EditorBottomBar(
 }
 
 suspend fun loadBitmapFromUri(
-    context: Context,
-    uri: Uri,
+  context: Context,
+  uri: Uri,
+  onImageLoading: (Boolean) -> Unit,
 ): Bitmap? =
-    withContext(Dispatchers.IO) {
-      try {
-        val source = ImageDecoder.createSource(context.contentResolver, uri)
-        ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
-          decoder.isMutableRequired = true
-          decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+  withContext(Dispatchers.IO) {
+    onImageLoading(true)
+    try {
+      val source = ImageDecoder.createSource(context.contentResolver, uri)
+
+      ImageDecoder.decodeBitmap(source) { decoder, info, _ ->
+        decoder.isMutableRequired = true
+        decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+
+        val srcWidth = info.size.width
+        val srcHeight = info.size.height
+
+        // ---- HARD LIMIT (no upscaling) ----
+        val scale =
+          minOf(
+            MAX_DIMENSION.toFloat() / srcWidth,
+            MAX_DIMENSION.toFloat() / srcHeight,
+            1f
+          )
+
+        val targetWidth = (srcWidth * scale).toInt()
+        val targetHeight = (srcHeight * scale).toInt()
+
+        if (targetWidth != srcWidth || targetHeight != srcHeight) {
+          decoder.setTargetSize(targetWidth, targetHeight)
         }
-      } catch (e: Exception) {
-        e.printStackTrace()
-        null
       }
+    } catch (e: Exception) {
+      e.printStackTrace()
+      null
+    } finally {
+      onImageLoading(false)
     }
+  }
 
 /*
 

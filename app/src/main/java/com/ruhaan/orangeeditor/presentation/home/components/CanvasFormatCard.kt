@@ -22,12 +22,12 @@ fun CanvasFormatCard(
     onClick: () -> Unit,
 ) {
   Card(
-      modifier = modifier.fillMaxWidth().aspectRatio(0.85f).clickable { onClick() },
+      modifier = modifier.size(180.dp).clickable { onClick() },
       colors = CardDefaults.cardColors(containerColor = CardBackground),
       elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
   ) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {

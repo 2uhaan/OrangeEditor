@@ -17,14 +17,19 @@ import com.ruhaan.orangeeditor.domain.model.layer.toColorMatrix
 
 class EditorRenderer {
 
-  fun draw(canvas: Canvas, layers: List<Layer>) {
+  fun draw(
+      canvas: Canvas,
+      layers: List<Layer>,
+      scaleX: Float = 1f,
+      scaleY: Float = 1f,
+  ) {
     layers
         .sortedBy { it.zIndex }
         .filter { it.visible }
         .forEach { layer ->
           when (layer) {
-            is TextLayer -> drawText(canvas, layer)
-            is ImageLayer -> drawImage(canvas, layer)
+            is TextLayer -> drawText(canvas, layer, scaleX, scaleY)
+            is ImageLayer -> drawImage(canvas, layer, scaleX, scaleY)
           }
         }
   }
