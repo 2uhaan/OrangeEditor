@@ -7,7 +7,8 @@ import com.ruhaan.orangeeditor.data.dao.TextLayerDao
 import com.ruhaan.orangeeditor.data.database.OrangeDatabase
 import com.ruhaan.orangeeditor.data.repository.OrangeRepositoryImpl
 import com.ruhaan.orangeeditor.domain.repository.OrangeRepository
-import com.ruhaan.orangeeditor.util.AppStorage
+import com.ruhaan.orangeeditor.util.EditorRenderer
+import com.ruhaan.orangeeditor.util.Storage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,10 +35,14 @@ class Module {
 
   @Provides @Singleton fun provideTextLayerDao(db: OrangeDatabase): TextLayerDao = db.textLayerDao()
 
+  @Provides @Singleton fun provideEditorRender(): EditorRenderer = EditorRenderer()
+
   @Provides
   @Singleton
-  fun provideAppStorage(@ApplicationContext context: Context): AppStorage =
-      AppStorage(context = context)
+  fun provideStorage(
+      @ApplicationContext context: Context,
+      editorRenderer: EditorRenderer,
+  ): Storage = Storage(context = context, editorRenderer = editorRenderer)
 
   @Provides
   @Singleton
@@ -45,12 +50,12 @@ class Module {
       editorStateDao: EditorStateDao,
       imageLayerDao: ImageLayerDao,
       textLayerDao: TextLayerDao,
-      appStorage: AppStorage,
+      storage: Storage,
   ): OrangeRepository =
       OrangeRepositoryImpl(
           editorStateDao = editorStateDao,
           imageLayerDao = imageLayerDao,
           textLayerDao = textLayerDao,
-          appStorage = appStorage,
+          storage = storage,
       )
 }
