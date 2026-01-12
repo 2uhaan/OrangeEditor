@@ -7,18 +7,29 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ruhaan.orangeeditor.presentation.theme.CanvasOrange
 
 @Composable
 fun AspectRatioPreview(aspectRatio: String, modifier: Modifier = Modifier) {
 
   Box(
-      modifier = modifier.size(calculateDpSize(aspectRatio)).background(CanvasOrange),
+      modifier =
+          modifier
+              .background(
+                  brush =
+                      Brush.linearGradient(
+                          colors = listOf(Color(0xFFF47D34), Color(0xFFFFFFFF)),
+                          start = Offset(0f, 0f),
+                          end = Offset(800f, 800f),
+                      )
+              )
+              .size(calculateDpSize(aspectRatio)),
       contentAlignment = Alignment.Center,
   ) {
     Text(text = aspectRatio, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
