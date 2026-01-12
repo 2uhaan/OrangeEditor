@@ -16,6 +16,9 @@ interface EditorStateDao {
   @Query("SELECT * FROM EDITOR_STATES WHERE editorId = :editorId")
   suspend fun getEditorStateEntityById(editorId: String): EditorStateEntity
 
+  @Query("SELECT * FROM EDITOR_STATES WHERE editorId = :editorId")
+  suspend fun getEditorStateEntityByIdCanNull (editorId: String) : EditorStateEntity?
+
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun saveEditorStateEntity(editorStateEntity: EditorStateEntity)
 
