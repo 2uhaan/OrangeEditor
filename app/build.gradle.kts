@@ -57,6 +57,9 @@ dependencies {
   ksp("com.google.dagger:hilt-android-compiler:2.57.2")
   implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
 
+  // Coil Image
+  implementation("io.coil-kt.coil3:coil-compose:3.3.0")
+
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.lifecycle.runtime.ktx)
   implementation(libs.androidx.activity.compose)
