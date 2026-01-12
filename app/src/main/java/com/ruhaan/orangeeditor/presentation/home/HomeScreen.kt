@@ -11,13 +11,17 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,6 +29,7 @@ import androidx.navigation.NavHostController
 import com.ruhaan.orangeeditor.domain.model.format.CanvasFormat
 import com.ruhaan.orangeeditor.presentation.editor.EditorViewModel
 import com.ruhaan.orangeeditor.presentation.home.components.CanvasFormatCard
+import com.ruhaan.orangeeditor.presentation.home.components.DraftCard
 import com.ruhaan.orangeeditor.presentation.navigation.Route
 import com.ruhaan.orangeeditor.presentation.theme.BackgroundLight
 import com.ruhaan.orangeeditor.presentation.theme.TextPrimary
@@ -88,6 +93,36 @@ fun HomeScreen(
           }
         }
       }
+    }
+
+    // Draft
+    item(span = { GridItemSpan(maxLineSpan) }) {
+      Column(modifier = Modifier.padding(top = 20.dp, bottom = 8.dp)) {
+        Text(
+            text = "Draft",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = TextPrimary,
+        )
+      }
+    }
+
+    itemsIndexed(allDraft) { _, draft ->
+      DraftCard(
+        modifier =
+          Modifier.shadow(elevation = 6.dp, shape = RoundedCornerShape(12.dp), clip = false)
+            .background(
+              color = MaterialTheme.colorScheme.surface,
+              shape = RoundedCornerShape(12.dp),
+            )
+            .padding(8.dp),
+        draft = draft,
+        onClick = {
+          viewmodel.selectedDraft(draft.editorId)
+          navController.navigate(Route.Editor.route)
+        },
+        onDeleteClick = { viewmodel.deleteSavedDraft(draft.editorId) },
+      )
     }
   }
 }
