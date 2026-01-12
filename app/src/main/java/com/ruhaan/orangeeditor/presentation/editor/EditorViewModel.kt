@@ -400,6 +400,10 @@ constructor(private val orangeRepository: OrangeRepository, private val storage:
     }
   }
 
+  fun updateCanvasSize(size: IntSize) {
+    _editorState.update { it.copy(canvasSize = size) }
+  }
+
   fun deleteSavedDraft(editorId: String) {
     viewModelScope.launch { orangeRepository.deleteEditorStateById(editorId = editorId) }
   }
