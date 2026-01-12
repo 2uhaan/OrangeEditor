@@ -198,7 +198,11 @@ fun EditorScreen(
               canUndo = viewModel.canUndo(),
               canRedo = viewModel.canRedo(),
               canDelete = editorState.selectedLayerId != null,
-              onBackClick = { navController.popBackStack() },
+              onBackClick = {
+                viewModel.saveDraft()
+                viewModel.resetState()
+                navController.popBackStack()
+              },
               onFileNameClick = { showFileNameSheet = true },
               onUndoClick = { viewModel.undo() },
               onRedoClick = { viewModel.redo() },

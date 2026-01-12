@@ -48,6 +48,7 @@ fun NavGraph(
       BackHandler(enabled = true) {
         if (backPressedOnce) {
           navController.popBackStack()
+          viewmodel.saveDraft()
           viewmodel.resetState()
         } else {
           backPressedOnce = true

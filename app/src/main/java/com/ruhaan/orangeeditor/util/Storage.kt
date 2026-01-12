@@ -56,20 +56,17 @@ class Storage(private val context: Context, private val editorRenderer: EditorRe
       canvasFormat: CanvasFormat,
       canvasScreenSize: IntSize,
   ): Bitmap {
-
     val exportBitmap = createBitmap(canvasFormat.width, canvasFormat.height)
+    val canvas = Canvas(exportBitmap)
+    canvas.drawColor(android.graphics.Color.WHITE)
 
     if (layers.isEmpty()) {
-      Toast.makeText(context, "Nothing to export", Toast.LENGTH_SHORT).show()
       return exportBitmap
     }
 
     try {
       val scaleX = canvasFormat.width.toFloat() / canvasScreenSize.width
       val scaleY = canvasFormat.height.toFloat() / canvasScreenSize.height
-
-      val canvas = Canvas(exportBitmap)
-      canvas.drawColor(android.graphics.Color.WHITE)
 
       canvas.save()
       editorRenderer.draw(canvas, layers, scaleX, scaleY)
