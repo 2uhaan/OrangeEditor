@@ -2,11 +2,16 @@ package com.ruhaan.orangeeditor.presentation.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -26,6 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil3.compose.AsyncImage
+import com.ruhaan.orangeeditor.R
 import com.ruhaan.orangeeditor.domain.model.format.CanvasFormat
 import com.ruhaan.orangeeditor.presentation.editor.EditorViewModel
 import com.ruhaan.orangeeditor.presentation.home.components.CanvasFormatCard
@@ -49,8 +56,10 @@ fun HomeScreen(
           modifier
               .fillMaxSize()
               .background(BackgroundLight)
-              .padding(top = 60.dp, bottom = 8.dp, start = 20.dp, end = 20.dp),
+              .windowInsetsPadding(WindowInsets.safeDrawing)
+              .padding(top = 20.dp, bottom = 8.dp, start = 20.dp, end = 20.dp),
       horizontalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterHorizontally),
+      verticalArrangement = Arrangement.spacedBy(16.dp),
   ) {
 
     // Header
@@ -107,22 +116,34 @@ fun HomeScreen(
       }
     }
 
-    itemsIndexed(allDraft) { _, draft ->
-      DraftCard(
-        modifier =
-          Modifier.shadow(elevation = 6.dp, shape = RoundedCornerShape(12.dp), clip = false)
-            .background(
-              color = MaterialTheme.colorScheme.surface,
-              shape = RoundedCornerShape(12.dp),
-            )
-            .padding(8.dp),
-        draft = draft,
-        onClick = {
-          viewmodel.selectedDraft(draft.editorId)
-          navController.navigate(Route.Editor.route)
-        },
-        onDeleteClick = { viewmodel.deleteSavedDraft(draft.editorId) },
-      )
+    if (allDraft.isNotEmpty()) {
+      itemsIndexed(allDraft) { _, draft ->
+        DraftCard(
+            modifier =
+                Modifier.shadow(elevation = 6.dp, shape = RoundedCornerShape(12.dp), clip = false)
+                    .background(
+                        color = MaterialTheme.colorScheme.surface,
+                        shape = RoundedCornerShape(12.dp),
+                    )
+                    .padding(8.dp),
+            draft = draft,
+            onClick = {
+              viewmodel.selectedDraft(draft.editorId)
+              navController.navigate(Route.Editor.route)
+            },
+            onDeleteClick = { viewmodel.deleteSavedDraft(draft.editorId) },
+        )
+      }
+    } else {
+      item(span = { GridItemSpan(maxLineSpan) }) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+          AsyncImage(
+              modifier = Modifier.size(300.dp),
+              model = R.drawable.img_emty_draft,
+              contentDescription = null,
+          )
+        }
+      }
     }
   }
 }
