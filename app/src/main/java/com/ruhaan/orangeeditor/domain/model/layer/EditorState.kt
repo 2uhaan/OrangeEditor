@@ -8,5 +8,5 @@ data class EditorState(
     val canvasFormat: CanvasFormat = CanvasFormat.POST,
     val layers: List<Layer> = emptyList(),
     val selectedLayerId: String? = null,
-    val fileName: String = "Draft",
+    val fileName: String = "Untitled",
 )

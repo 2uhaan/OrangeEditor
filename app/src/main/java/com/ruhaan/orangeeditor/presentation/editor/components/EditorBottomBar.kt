@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.ruhaan.orangeeditor.R
 import com.ruhaan.orangeeditor.presentation.components.LargeIconButton
+import com.ruhaan.orangeeditor.util.BottomBarMode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,12 +26,15 @@ import kotlinx.coroutines.withContext
 @Composable
 fun EditorBottomBar(
     modifier: Modifier = Modifier,
+    mode: BottomBarMode,
     onImageImportClick: (Bitmap) -> Unit,
-    onTextClick: () -> Unit,
+    onAddTextClick: () -> Unit,
+    onEditTextClick: () -> Unit,
     onFilterClick: () -> Unit,
     onAdjustmentsClick: () -> Unit,
     onCropClick: () -> Unit,
     onPositionClick: () -> Unit,
+    onExportClick: () -> Unit,
 ) {
   val context = LocalContext.current
   val scope = rememberCoroutineScope()
@@ -70,52 +74,82 @@ fun EditorBottomBar(
       LargeIconButton(
           modifier = Modifier.widthIn(min = 80.dp),
           iconId = R.drawable.ic_text,
-          contentDescription = "text",
-          label = "Text",
+          contentDescription = "Add text",
+          label = "Add Text",
       ) {
-        onTextClick()
+        onAddTextClick()
+      }
+    }
+
+    if (mode == BottomBarMode.TextLayerSelected) {
+      item {
+        LargeIconButton(
+            modifier = Modifier.widthIn(min = 80.dp),
+            iconId = R.drawable.ic_edit_text,
+            contentDescription = "Edit text",
+            label = "Edit Text",
+        ) {
+          onEditTextClick()
+        }
+      }
+    }
+
+    if (mode == BottomBarMode.ImageLayerSelected) {
+      item {
+        LargeIconButton(
+            modifier = Modifier.widthIn(min = 80.dp),
+            iconId = R.drawable.ic_image_filter,
+            contentDescription = "filters",
+            label = "Filter",
+        ) {
+          onFilterClick()
+        }
+      }
+    }
+
+    if (mode == BottomBarMode.ImageLayerSelected) {
+      item {
+        LargeIconButton(
+            modifier = Modifier.widthIn(min = 80.dp),
+            iconId = R.drawable.ic_adjustments,
+            contentDescription = "adjustments",
+            label = "Adjust",
+        ) {
+          onAdjustmentsClick()
+        }
+      }
+    }
+
+    if (mode == BottomBarMode.ImageLayerSelected) {
+      item {
+        LargeIconButton(
+            modifier = Modifier.widthIn(min = 80.dp),
+            iconId = R.drawable.ic_crop,
+            contentDescription = "crop image",
+            label = "Crop",
+            onClick = onCropClick,
+        )
       }
     }
 
     item {
       LargeIconButton(
           modifier = Modifier.widthIn(min = 80.dp),
-          iconId = R.drawable.ic_image_filter,
-          contentDescription = "filters",
-          label = "Filter",
-      ) {
-        onFilterClick()
-      }
-    }
-
-    item {
-      LargeIconButton(
-          modifier = Modifier.widthIn(min = 80.dp),
-          iconId = R.drawable.ic_adjustments,
-          contentDescription = "adjustments",
-          label = "Adjust",
-      ) {
-        onAdjustmentsClick()
-      }
-    }
-
-    item {
-      LargeIconButton(
-          modifier = Modifier.widthIn(min = 80.dp),
-          iconId = R.drawable.ic_crop,
-          contentDescription = "crop image",
-          label = "Crop",
-          onClick = onCropClick,
-      )
-    }
-    item {
-      LargeIconButton(
-          modifier = Modifier.widthIn(min = 80.dp),
-          iconId = R.drawable.ic_position, // ← Use your position icon
+          iconId = R.drawable.ic_position,
           contentDescription = "Position",
           label = "Position",
       ) {
         onPositionClick()
+      }
+    }
+    item {
+      LargeIconButton(
+          modifier = Modifier.widthIn(min = 80.dp),
+          iconId = R.drawable.ic_export,
+          contentDescription = "export image",
+          label = "Export",
+      ) {
+        onExportClick()
       }
     }
   }
@@ -137,3 +171,13 @@ suspend fun loadBitmapFromUri(
         null
       }
     }
+
+/*
+
+Primary -> (default: Add Image, Add Text, Layer Position, Export)
+
+TextLayerSelected -> (Add Image, Add Text, Layer Position, Export)
+
+ImageLayerSelected -> (Add Image, Add Text, Filter, Adjustments, Crop, Layer Position, Export)
+
+ */

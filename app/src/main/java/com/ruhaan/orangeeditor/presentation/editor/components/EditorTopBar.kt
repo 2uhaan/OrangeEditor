@@ -33,8 +33,7 @@ fun EditorTopBar(
     onUndoClick: () -> Unit,
     onRedoClick: () -> Unit,
     onDeleteClick: () -> Unit,
-    onDraftClick : () -> Unit,
-    onExportClick: () -> Unit,
+    onDraftClick: () -> Unit,
 ) {
   Row(
       modifier = modifier.padding(end = 15.dp, bottom = 5.dp),
@@ -95,19 +94,12 @@ fun EditorTopBar(
     ) {
       onDeleteClick()
     }
-    LargeIconButton(
-        modifier = Modifier.weight(1f),
-        iconId = R.drawable.ic_text,
-        contentDescription = "Draft",
-    ) {
-      onDraftClick()
-    }
 
     Button(
-        onClick = onExportClick,
+        onClick = onDraftClick,
         colors = ButtonDefaults.buttonColors().copy(containerColor = Color.White),
     ) {
-      Text(text = "Export", style = Typography.titleSmall)
+      Text(text = "Draft", style = Typography.titleSmall)
     }
   }
 }
