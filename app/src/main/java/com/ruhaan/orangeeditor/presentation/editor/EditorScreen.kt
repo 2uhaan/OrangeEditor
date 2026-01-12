@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -70,6 +72,7 @@ fun EditorScreen(
   var showAdjustmentsSheet by remember { mutableStateOf(false) }
   var showFileNameSheet by remember { mutableStateOf(false) }
   var showPositionSheet by remember { mutableStateOf(false) }
+  var loadingImage by remember { mutableStateOf(false) }
   var showExportSheet by remember { mutableStateOf(false) }
 
   // Compute current bottom bar mode
@@ -245,6 +248,7 @@ fun EditorScreen(
               onCropClick = { navController.navigate(Route.CropScreen.route) },
               onPositionClick = { showPositionSheet = true },
               onExportClick = { viewModel.startExport(context, canvasFormat, canvasSize) },
+              onImageLoading = { loadingImage = it },
           )
         }
       },
@@ -257,12 +261,24 @@ fun EditorScreen(
       EditorCanvas(
           state = editorState,
           canvasFormat = canvasFormat,
-          onCanvasSize = { size -> canvasSize = size },
+          onCanvasSize = { size ->
+            canvasSize = size
+            viewModel.updateCanvasSize(size = size)
+          },
       )
       SelectedLayerGestureLayer(
           state = editorState,
           onUpdateLayer = viewModel::updateLayer,
       )
+      if (loadingImage) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+          CircularProgressIndicator()
+        }
+      }
     }
   }
 }
