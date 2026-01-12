@@ -1,5 +1,9 @@
 package com.ruhaan.orangeeditor.presentation.editor
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,12 +33,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ruhaan.orangeeditor.domain.model.layer.ExportResult
 import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustment
 import com.ruhaan.orangeeditor.presentation.editor.components.AddTextSheet
 import com.ruhaan.orangeeditor.presentation.editor.components.AdjustmentsSheet
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorBottomBar
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorCanvas
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorTopBar
+import com.ruhaan.orangeeditor.presentation.editor.components.ExportSuccessSheet
 import com.ruhaan.orangeeditor.presentation.editor.components.FileNameSheet
 import com.ruhaan.orangeeditor.presentation.editor.components.FilterRow
 import com.ruhaan.orangeeditor.presentation.editor.components.LayerPositionSheet
@@ -54,6 +60,7 @@ fun EditorScreen(
   var currentSelectedTextLayer by remember { mutableStateOf(viewModel.getSelectedTextLayer()) }
   var currentSelectedImageLayer by remember { mutableStateOf(viewModel.getSelectedImagerLayer()) }
   val context = LocalContext.current
+  val exportResult by viewModel.exportResult.collectAsState()
 
   // Local states
   var canvasSize by remember { mutableStateOf(IntSize.Zero) }
@@ -63,6 +70,7 @@ fun EditorScreen(
   var showAdjustmentsSheet by remember { mutableStateOf(false) }
   var showFileNameSheet by remember { mutableStateOf(false) }
   var showPositionSheet by remember { mutableStateOf(false) }
+  var showExportSheet by remember { mutableStateOf(false) }
 
   // Compute current bottom bar mode
   val bottomBarMode by
@@ -71,6 +79,30 @@ fun EditorScreen(
   LaunchedEffect(editorState) {
     currentSelectedTextLayer = viewModel.getSelectedTextLayer()
     currentSelectedImageLayer = viewModel.getSelectedImagerLayer()
+  }
+
+  LaunchedEffect(exportResult) {
+    when (exportResult) {
+      is ExportResult.Success -> {
+        showExportSheet = true
+      }
+      is ExportResult.Error -> {
+        // Already handled by Toast in startExport
+      }
+      ExportResult.Idle -> {
+        // Nothing
+      }
+    }
+  }
+
+  fun shareImage(context: Context, uri: Uri) {
+    val shareIntent =
+        Intent(Intent.ACTION_SEND).apply {
+          type = "image/png"
+          putExtra(Intent.EXTRA_STREAM, uri)
+          addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+    context.startActivity(Intent.createChooser(shareIntent, "Share image"))
   }
 
   if (showAddTextSheet)
@@ -129,6 +161,28 @@ fun EditorScreen(
         onMoveUp = viewModel::moveLayerUp,
         onMoveDown = viewModel::moveLayerDown,
         onDismissRequest = { showPositionSheet = false },
+    )
+  }
+  if (showExportSheet) {
+    ExportSuccessSheet(
+        onDismissRequest = {
+          showExportSheet = false
+          // Reset exportResult when sheet is dismissed
+          viewModel.resetExportResult()
+        },
+        onShare = {
+          val uri = (exportResult as? ExportResult.Success)?.uri
+          if (uri != null) {
+            shareImage(context, uri)
+          } else {
+            Toast.makeText(
+                    context,
+                    "Could not share: file saved but URI unavailable",
+                    Toast.LENGTH_LONG,
+                )
+                .show()
+          }
+        },
     )
   }
 
@@ -190,7 +244,7 @@ fun EditorScreen(
               onAdjustmentsClick = { showAdjustmentsSheet = true },
               onCropClick = { navController.navigate(Route.CropScreen.route) },
               onPositionClick = { showPositionSheet = true },
-              onExportClick = { viewModel.exportImage(context, canvasFormat, canvasSize) },
+              onExportClick = { viewModel.startExport(context, canvasFormat, canvasSize) },
           )
         }
       },

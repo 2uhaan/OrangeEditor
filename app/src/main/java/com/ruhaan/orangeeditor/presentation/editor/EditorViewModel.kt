@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Toast
@@ -17,6 +18,7 @@ import androidx.lifecycle.viewModelScope
 import com.ruhaan.orangeeditor.domain.model.format.CanvasFormat
 import com.ruhaan.orangeeditor.domain.model.layer.Adjustment
 import com.ruhaan.orangeeditor.domain.model.layer.EditorState
+import com.ruhaan.orangeeditor.domain.model.layer.ExportResult
 import com.ruhaan.orangeeditor.domain.model.layer.ImageFilter
 import com.ruhaan.orangeeditor.domain.model.layer.ImageLayer
 import com.ruhaan.orangeeditor.domain.model.layer.Layer
@@ -34,6 +36,7 @@ import java.util.Locale
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -63,6 +66,9 @@ class EditorViewModel @Inject constructor(private val orangeRepository: OrangeRe
 
   private var nextTextId = 1
   private var nextImageId = 1
+
+  private val _exportResult = MutableStateFlow<ExportResult>(ExportResult.Idle)
+  val exportResult: StateFlow<ExportResult> = _exportResult.asStateFlow()
 
   fun resetState() {
     _editorState.update { it.copy(layers = emptyList(), selectedLayerId = null) }
@@ -349,19 +355,13 @@ class EditorViewModel @Inject constructor(private val orangeRepository: OrangeRe
     }
   }
 
-  fun exportImage(context: Context, canvasFormat: CanvasFormat, canvasScreenSize: IntSize) {
-    val currentLayers = _editorState.value.layers
-    val currentFileName = _editorState.value.fileName
-
-    if (currentLayers.isEmpty()) {
-      Toast.makeText(context, "Nothing to export", Toast.LENGTH_SHORT).show()
-      return
-    }
-
+  fun startExport(context: Context, canvasFormat: CanvasFormat, canvasScreenSize: IntSize) {
     viewModelScope.launch {
+      _exportResult.value = ExportResult.Idle // Reset before export
+
       try {
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val fileName = "${currentFileName}_${timestamp}.png"
+        val fileName = "${_editorState.value.fileName}_${timestamp}.png"
         val scaleX = canvasFormat.width.toFloat() / canvasScreenSize.width
         val scaleY = canvasFormat.height.toFloat() / canvasScreenSize.height
 
@@ -369,7 +369,7 @@ class EditorViewModel @Inject constructor(private val orangeRepository: OrangeRe
         val canvas = Canvas(exportBitmap)
         canvas.drawColor(android.graphics.Color.WHITE)
 
-        currentLayers
+        _editorState.value.layers
             .sortedBy { it.zIndex }
             .filter { it.visible }
             .forEach { layer ->
@@ -379,23 +379,23 @@ class EditorViewModel @Inject constructor(private val orangeRepository: OrangeRe
               }
             }
 
-        val saved = saveBitmapToDownloads(context, exportBitmap, fileName)
+        val savedUri = saveBitmapToDownloads(context, exportBitmap, fileName)
         exportBitmap.recycle()
 
-        Toast.makeText(
-                context,
-                if (saved) "Exported successfully!" else "Export failed",
-                Toast.LENGTH_LONG,
-            )
-            .show()
+        _exportResult.value = ExportResult.Success(savedUri)
       } catch (e: Exception) {
         e.printStackTrace()
+        _exportResult.value = ExportResult.Error("Export failed: ${e.message}")
         Toast.makeText(context, "Export failed: ${e.message}", Toast.LENGTH_LONG).show()
       }
     }
   }
 
-  private fun saveBitmapToDownloads(context: Context, bitmap: Bitmap, fileName: String): Boolean {
+  fun resetExportResult() {
+    _exportResult.value = ExportResult.Idle
+  }
+
+  private fun saveBitmapToDownloads(context: Context, bitmap: Bitmap, fileName: String): Uri? {
     return try {
       val resolver = context.contentResolver
 
@@ -415,11 +415,11 @@ class EditorViewModel @Inject constructor(private val orangeRepository: OrangeRe
         resolver.openOutputStream(uri)?.use { outputStream ->
           bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
         }
-        true
-      } ?: false
+      }
+      imageUri // return the Uri (can be null)
     } catch (e: Exception) {
       e.printStackTrace()
-      false
+      null
     }
   }
 
