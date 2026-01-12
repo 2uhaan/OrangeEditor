@@ -134,6 +134,9 @@ fun HomeScreen(
             onDeleteClick = { viewmodel.deleteSavedDraft(draft.editorId) },
         )
       }
+      item(span = {GridItemSpan(maxLineSpan)}) {
+        Spacer(modifier = Modifier.height(12.dp))
+      }
     } else {
       item(span = { GridItemSpan(maxLineSpan) }) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
