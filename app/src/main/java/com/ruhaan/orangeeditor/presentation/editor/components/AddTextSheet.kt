@@ -79,7 +79,7 @@ fun AddTextSheet(
   var selectedFontWeight by remember { mutableStateOf(prevSelectedFontWeight) }
   var selectedFontStyle by remember { mutableStateOf(prevSelectedFontStyle) }
   val sliderState = remember {
-    SliderState(value = prevFontSize.toFloat(), valueRange = 10f..150f, steps = 0)
+    SliderState(value = prevFontSize.toFloat(), valueRange = 10f..300f, steps = 0)
   }
 
   // Other
