@@ -72,6 +72,10 @@ constructor(private val orangeRepository: OrangeRepository, private val storage:
     _editorState.update { it.copy(layers = it.layers + layer, selectedLayerId = layer.id) }
   }
 
+  fun selectedLayer(id: String) {
+    _editorState.update { state -> state.copy(selectedLayerId = id) }
+  }
+
   fun addImageLayer(
       bitmap: Bitmap,
       imageFilter: ImageFilter = ImageFilter.NO_FILTER,
