@@ -41,6 +41,7 @@ fun Filter(imageFilter: ImageFilter, onClick: (ImageFilter) -> Unit) {
         text = imageFilter.previewName,
         style = Typography.labelLarge,
         textAlign = TextAlign.Center,
+        minLines = 2,
     )
   }
 }
