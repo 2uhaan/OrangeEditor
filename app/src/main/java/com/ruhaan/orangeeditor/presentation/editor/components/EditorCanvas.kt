@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.ruhaan.orangeeditor.domain.model.format.CanvasFormat
 import com.ruhaan.orangeeditor.domain.model.layer.EditorState
+import com.ruhaan.orangeeditor.domain.model.layer.Layer
 import com.ruhaan.orangeeditor.util.EditorRenderer
 import kotlin.math.min
 
@@ -29,6 +30,8 @@ fun EditorCanvas(
     canvasFormat: CanvasFormat,
     state: EditorState,
     onCanvasSize: (IntSize) -> Unit,
+    onLayerTapped: (String) -> Unit,
+    onUpdateLayer: (Layer) -> Unit,
 ) {
 
   val renderer = remember { EditorRenderer() }
@@ -66,9 +69,26 @@ fun EditorCanvas(
         contentAlignment = Alignment.Center,
     ) {
       Surface(shadowElevation = 2.dp, color = Color.White) {
-        Canvas(modifier = Modifier.size(width = canvasWidth, height = canvasHeight)) {
-          val layers = state.layers // to update after reordering
-          drawIntoCanvas { composeCanvas -> renderer.draw(composeCanvas.nativeCanvas, layers) }
+        Box(
+            modifier =
+                Modifier.size(canvasWidth, canvasHeight)
+                    .border(2.dp, Color.Blue) // ONE border, shared
+        ) {
+          // Canvas
+          Canvas(modifier = Modifier.fillMaxSize()) {
+            drawIntoCanvas {
+              renderer.draw(it.nativeCanvas, state.layers, onTextMeasured = onUpdateLayer)
+            }
+          }
+
+          // Gesture
+          GestureBox(
+              width = canvasWidth,
+              height = canvasHeight,
+              state = state,
+              onLayerTapped = onLayerTapped,
+              onUpdateLayer = onUpdateLayer,
+          )
         }
       }
     }

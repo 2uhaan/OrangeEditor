@@ -46,7 +46,6 @@ import com.ruhaan.orangeeditor.presentation.editor.components.ExportSuccessSheet
 import com.ruhaan.orangeeditor.presentation.editor.components.FileNameSheet
 import com.ruhaan.orangeeditor.presentation.editor.components.FilterRow
 import com.ruhaan.orangeeditor.presentation.editor.components.LayerPositionSheet
-import com.ruhaan.orangeeditor.presentation.editor.components.SelectedLayerGestureLayer
 import com.ruhaan.orangeeditor.presentation.navigation.Route
 import com.ruhaan.orangeeditor.presentation.theme.CanvasOrange
 
@@ -269,10 +268,8 @@ fun EditorScreen(
             canvasSize = size
             viewModel.updateCanvasSize(size = size)
           },
-      )
-      SelectedLayerGestureLayer(
-          state = editorState,
           onUpdateLayer = viewModel::updateLayer,
+          onLayerTapped = viewModel::selectedLayer,
       )
       if (loadingImage) {
         Column(
@@ -286,36 +283,3 @@ fun EditorScreen(
     }
   }
 }
-
-// Old Text Botton.
-
-//  if (showAddTextSheet)
-//      AddTextSheet(
-//          onDismissRequest = { showAddTextSheet = false },
-//          isNew = currentSelectedTextLayer == null,
-//          prevInputText = currentSelectedTextLayer?.text ?: "",
-//          prevFontWeight = currentSelectedTextLayer?.fontWeight ?: FontWeight.Normal,
-//          prevFontStyle = currentSelectedTextLayer?.fontStyle ?: FontStyle.Normal,
-//          prevFontSize = currentSelectedTextLayer?.fontSizeInPx ?: 80,
-//          prevColor = currentSelectedTextLayer?.color ?: Color.Black,
-//          onTextAdd = { isNewText, text, fontSize, fontColor, fontWeight, fontStyle ->
-//            if (isNewText || currentSelectedTextLayer == null)
-//                viewModel.addTextLayer(
-//                    text = text,
-//                    fontSizeInPx = fontSize,
-//                    color = fontColor,
-//                    fontWeight = fontWeight,
-//                    fontStyle = fontStyle,
-//                    canvasWidthInPx = canvasSize.width.toFloat(),
-//                    canvasHeightInPx = canvasSize.height.toFloat(),
-//                )
-//            else
-//                viewModel.updateSelectedTextLayer(
-//                    text = text,
-//                    fontSizeInPx = fontSize,
-//                    fontColor = fontColor,
-//                    fontWeight = fontWeight,
-//                    fontStyle = fontStyle,
-//                )
-//          },
-//      )
