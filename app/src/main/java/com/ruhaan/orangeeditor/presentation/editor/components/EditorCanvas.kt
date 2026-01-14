@@ -72,12 +72,16 @@ fun EditorCanvas(
         Box(
             modifier =
                 Modifier.size(canvasWidth, canvasHeight)
-                    .border(2.dp, Color.Blue) // ONE border, shared
         ) {
           // Canvas
           Canvas(modifier = Modifier.fillMaxSize()) {
             drawIntoCanvas {
-              renderer.draw(it.nativeCanvas, state.layers, onTextMeasured = onUpdateLayer)
+              renderer.draw(
+                  it.nativeCanvas,
+                  state.layers,
+                  onTextMeasured = onUpdateLayer,
+                  selectedLayerId = state.selectedLayerId,
+              )
             }
           }
 
