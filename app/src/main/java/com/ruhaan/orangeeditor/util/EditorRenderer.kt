@@ -14,6 +14,7 @@ import com.ruhaan.orangeeditor.domain.model.layer.Layer
 import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustment
 import com.ruhaan.orangeeditor.domain.model.layer.TextLayer
 import com.ruhaan.orangeeditor.domain.model.layer.toColorMatrix
+import com.ruhaan.orangeeditor.presentation.theme.CanvasOrange
 
 class EditorRenderer {
 
@@ -22,6 +23,7 @@ class EditorRenderer {
       layers: List<Layer>,
       scaleX: Float = 1f,
       scaleY: Float = 1f,
+      selectedLayerId: String? = null,
       onTextMeasured: (TextLayer) -> Unit,
   ) {
     layers
@@ -29,8 +31,8 @@ class EditorRenderer {
         .filter { it.visible }
         .forEach { layer ->
           when (layer) {
-            is TextLayer -> drawText(canvas, layer, scaleX, scaleY, onTextMeasured)
-            is ImageLayer -> drawImage(canvas, layer, scaleX, scaleY)
+            is TextLayer -> drawText(canvas, layer, scaleX, scaleY, selectedLayerId,onTextMeasured)
+            is ImageLayer -> drawImage(canvas, layer, scaleX, scaleY, selectedLayerId)
           }
         }
   }
@@ -40,6 +42,7 @@ class EditorRenderer {
       layer: ImageLayer,
       scaleX: Float = 1f,
       scaleY: Float = 1f,
+      selectedLayerId: String? = null,
   ): Canvas {
     layer.bitmap?.let {
       canvas.withSave {
@@ -69,6 +72,22 @@ class EditorRenderer {
             -layer.bitmap.height / 2f,
             if (shouldApplyPaint) paint else null,
         )
+
+        if (selectedLayerId == layer.id) {
+          val borderPaint =
+              Paint().apply {
+                style = Paint.Style.STROKE
+                strokeWidth = 4f
+                color = CanvasOrange.toArgb()
+                isAntiAlias = true
+              }
+
+          // Image bounds (center-anchored)
+          val halfW = layer.bitmap.width / 2f
+          val halfH = layer.bitmap.height / 2f
+
+          drawRect(-halfW, -halfH, halfW, halfH, borderPaint)
+        }
       }
     }
     return canvas
@@ -79,6 +98,7 @@ class EditorRenderer {
       layer: TextLayer,
       scaleX: Float = 1f,
       scaleY: Float = 1f,
+      selectedLayerId: String? = null,
       onTextMeasured: ((TextLayer) -> Unit)? = null,
   ) {
     val paint =
@@ -110,6 +130,18 @@ class EditorRenderer {
       scale(t.scale * scaleX, t.scale * scaleY)
 
       drawText(layer.text, 0f, -bounds.top.toFloat(), paint)
+
+      if (selectedLayerId == layer.id) {
+        val borderPaint =
+            Paint().apply {
+              style = Paint.Style.STROKE
+              strokeWidth = 4f
+              color = CanvasOrange.toArgb()
+              isAntiAlias = true
+            }
+
+        drawRect(0f, 0f, layer.textWidthPx.toFloat(), layer.textHeightPx.toFloat(), borderPaint)
+      }
     }
   }
 

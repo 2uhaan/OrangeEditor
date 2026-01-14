@@ -1,6 +1,5 @@
 package com.ruhaan.orangeeditor.presentation.editor.components
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
@@ -9,10 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.ruhaan.orangeeditor.domain.model.layer.EditorState
 import com.ruhaan.orangeeditor.domain.model.layer.ImageLayer
 import com.ruhaan.orangeeditor.domain.model.layer.Layer
@@ -35,8 +32,7 @@ fun GestureBox(
 
   Box(
       modifier =
-          Modifier.border(2.dp, Color.Red)
-              .size(width, height)
+          Modifier.size(width, height)
               .pointerInput(state.layers) {
                 detectTapGestures { offset ->
                   val tappedText =
