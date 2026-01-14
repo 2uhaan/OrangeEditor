@@ -18,8 +18,7 @@ import com.ruhaan.orangeeditor.domain.model.layer.ImageLayer
 import com.ruhaan.orangeeditor.domain.model.layer.Layer
 import com.ruhaan.orangeeditor.domain.model.layer.TextLayer
 import com.ruhaan.orangeeditor.domain.model.layer.Transform
-import com.ruhaan.orangeeditor.domain.model.layer.hitTestImage
-import com.ruhaan.orangeeditor.domain.model.layer.hitTestText
+import com.ruhaan.orangeeditor.domain.model.layer.isIntersect
 
 @Composable
 fun GestureBox(
@@ -102,7 +101,7 @@ fun detectTappedLayer(
         .sortedByDescending { it.zIndex } // top-most first
         .firstOrNull { layer ->
           when (layer) {
-            is TextLayer -> layer.hitTestText(tapX, tapY)
-            is ImageLayer -> layer.hitTestImage(tapX, tapY)
+            is TextLayer -> layer.isIntersect(tapX, tapY)
+            is ImageLayer -> layer.isIntersect(tapX, tapY)
           }
         }

@@ -22,13 +22,14 @@ class EditorRenderer {
       layers: List<Layer>,
       scaleX: Float = 1f,
       scaleY: Float = 1f,
+      onTextMeasured: (TextLayer) -> Unit,
   ) {
     layers
         .sortedBy { it.zIndex }
         .filter { it.visible }
         .forEach { layer ->
           when (layer) {
-            is TextLayer -> drawText(canvas, layer, scaleX, scaleY)
+            is TextLayer -> drawText(canvas, layer, scaleX, scaleY, onTextMeasured)
             is ImageLayer -> drawImage(canvas, layer, scaleX, scaleY)
           }
         }
@@ -78,22 +79,37 @@ class EditorRenderer {
       layer: TextLayer,
       scaleX: Float = 1f,
       scaleY: Float = 1f,
+      onTextMeasured: ((TextLayer) -> Unit)? = null,
   ) {
+    val paint =
+        Paint().apply {
+          color = layer.color.toArgb()
+          textSize = layer.fontSizeInPx.toFloat()
+          isAntiAlias = true
+          typeface = resolveTypeface(layer.fontWeight, layer.fontStyle)
+        }
+
+    val bounds = android.graphics.Rect()
+    paint.getTextBounds(layer.text, 0, layer.text.length, bounds)
+
+    val newWidth = bounds.width()
+    val newHeight = bounds.height()
+
+    if (
+        newWidth > 0 &&
+            newHeight > 0 &&
+            (layer.textWidthPx != newWidth || layer.textHeightPx != newHeight)
+    ) {
+      onTextMeasured?.invoke(layer.copy(textWidthPx = newWidth, textHeightPx = newHeight))
+    }
+
     canvas.withSave {
       val t = layer.transform
       translate(t.x * scaleX, t.y * scaleY)
       rotate(t.rotation)
       scale(t.scale * scaleX, t.scale * scaleY)
 
-      val paint =
-          Paint().apply {
-            color = layer.color.toArgb()
-            textSize = layer.fontSizeInPx.toFloat()
-            isAntiAlias = true
-            typeface = resolveTypeface(layer.fontWeight, layer.fontStyle)
-          }
-
-      drawText(layer.text, 0f, 0f, paint)
+      drawText(layer.text, 0f, -bounds.top.toFloat(), paint)
     }
   }
 

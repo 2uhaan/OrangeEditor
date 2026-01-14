@@ -69,7 +69,7 @@ class Storage(private val context: Context, private val editorRenderer: EditorRe
       val scaleY = canvasFormat.height.toFloat() / canvasScreenSize.height
 
       canvas.save()
-      editorRenderer.draw(canvas, layers, scaleX, scaleY)
+      editorRenderer.draw(canvas, layers, scaleX, scaleY){}
 
       return exportBitmap
     } catch (e: Exception) {
