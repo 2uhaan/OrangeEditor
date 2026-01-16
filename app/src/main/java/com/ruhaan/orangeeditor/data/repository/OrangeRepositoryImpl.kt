@@ -1,5 +1,10 @@
 package com.ruhaan.orangeeditor.data.repository
 
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.graphics.createBitmap
 import com.ruhaan.orangeeditor.data.dao.EditorStateDao
 import com.ruhaan.orangeeditor.data.dao.ImageLayerDao
 import com.ruhaan.orangeeditor.data.dao.TextLayerDao
@@ -12,6 +17,7 @@ import com.ruhaan.orangeeditor.domain.model.layer.ImageLayer
 import com.ruhaan.orangeeditor.domain.model.layer.TextLayer
 import com.ruhaan.orangeeditor.domain.repository.OrangeRepository
 import com.ruhaan.orangeeditor.util.Storage
+import kotlin.collections.map
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -38,12 +44,23 @@ class OrangeRepositoryImpl(
         val allImageLayer = coroutineScope {
           allImageLayerEntity
               .map { entity ->
-                async { entity.toDomain(storage.loadBitmapFromPath(entity.bitmapStoredPath)) }
+                async { entity.toDomain(storage.loadBitmapFromPath(entity.base.bitmapStoredPath)) }
               }
               .awaitAll()
         }
 
-        val allTextLayer = allTextLayerEntity.map { textLayerEntity -> textLayerEntity.toDomain() }
+        val allTextLayer = coroutineScope {
+          allTextLayerEntity
+              .map { entity ->
+                async {
+                  entity.toDomain(
+                      storage.loadBitmapFromPath(entity.base.bitmapStoredPath)
+                          ?: createWhiteBitmap()
+                  )
+                }
+              }
+              .awaitAll()
+        }
         val combineList = (allImageLayer + allTextLayer).sortedBy { it.zIndex }
         val editorState = editorStateEntity.toDomain(layers = combineList)
         return@withContext editorState
@@ -52,7 +69,7 @@ class OrangeRepositoryImpl(
   override suspend fun saveEditorState(editorState: EditorState) =
       withContext(Dispatchers.IO) {
         // Delete old entry
-        val oldEditorState =  editorStateDao.getEditorStateEntityByIdCanNull(editorState.editorId)
+        val oldEditorState = editorStateDao.getEditorStateEntityByIdCanNull(editorState.editorId)
 
         oldEditorState?.let { deleteEditorStateById(oldEditorState.editorId) }
 
@@ -88,9 +105,20 @@ class OrangeRepositoryImpl(
                 }
               }
             }
+
             is TextLayer -> {
-              val textLayerEntity = layer.toEntity(editorState.editorId)
-              textLayerDao.saveTextLayerEntity(textLayerEntity = textLayerEntity)
+              layer.bitmap?.let { nonNumBitmap ->
+                val bitmapPath =
+                    storage.saveBitmapToAppStorage(
+                        bitmap = nonNumBitmap,
+                        storageType = StorageType.TEXT_DIR,
+                    )
+                bitmapPath?.let {
+                  val textLayerEntity =
+                      layer.toEntity(editorState.editorId, bitmapPath = bitmapPath)
+                  textLayerDao.saveTextLayerEntity(textLayerEntity = textLayerEntity)
+                }
+              }
             }
           }
         }
@@ -98,10 +126,26 @@ class OrangeRepositoryImpl(
 
   override suspend fun deleteEditorStateById(editorId: String) =
       withContext(Dispatchers.IO) {
+        // Delete text
+        val allTextLayerEntity = textLayerDao.geTextLayerByEditorStateId(editorId)
+        allTextLayerEntity.forEach { storage.deleteBitmapFromPath(it.base.bitmapStoredPath) }
+
+        // Delete image
         val allImageLayerEntity = imageLayerDao.getImagerLayerByEditorStateId(editorId)
+        allImageLayerEntity.forEach { storage.deleteBitmapFromPath(it.base.bitmapStoredPath) }
+
+        // Delete editor state
         val editorState = editorStateDao.getEditorStateEntityById(editorId)
         editorState.previewUrl?.let { path -> storage.deleteBitmapFromPath(path) }
-        allImageLayerEntity.forEach { storage.deleteBitmapFromPath(it.bitmapStoredPath) }
         editorStateDao.deleteEditorStateEntity(editorId)
       }
+
+  private fun createWhiteBitmap(): Bitmap {
+    val bitmap = createBitmap(1, 1)
+
+    val canvas = Canvas(bitmap)
+    canvas.drawColor(Color.White.toArgb())
+
+    return bitmap
+  }
 }

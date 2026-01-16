@@ -25,7 +25,6 @@ data class TextLayerEntity(
     val editorId: String,
     val text: String,
     val colorArgb: Int,
-    val fontSizeInPx: Int,
     /** This only support only Normal(0) and Bold(1). */
     val fontWeightValue: Int,
     /** This only support only Normal(0) and Italic(1). */
