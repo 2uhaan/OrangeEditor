@@ -129,7 +129,7 @@ fun GestureBox(
                                   Transform(
                                       x = snapX,
                                       y = snapY,
-                                      scale = currentLayer.transform.scale,
+                                      scale = 1f,
                                       rotation = layer.transform.rotation + rotation,
                                   )
                               layer.copy(
