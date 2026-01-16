@@ -31,7 +31,7 @@ class EditorRenderer {
         .filter { it.visible }
         .forEach { layer ->
           when (layer) {
-            is TextLayer -> drawText(canvas, layer, scaleX, scaleY, selectedLayerId,onTextMeasured)
+            is TextLayer -> drawText(canvas, layer, scaleX, scaleY, selectedLayerId, onTextMeasured)
             is ImageLayer -> drawImage(canvas, layer, scaleX, scaleY, selectedLayerId)
           }
         }
@@ -77,7 +77,7 @@ class EditorRenderer {
           val borderPaint =
               Paint().apply {
                 style = Paint.Style.STROKE
-                strokeWidth = 4f
+                strokeWidth = 8f
                 color = CanvasOrange.toArgb()
                 isAntiAlias = true
               }
@@ -86,7 +86,7 @@ class EditorRenderer {
           val halfW = layer.bitmap.width / 2f
           val halfH = layer.bitmap.height / 2f
 
-          drawRect(-halfW, -halfH, halfW, halfH, borderPaint)
+          drawRect(-(halfW + 10), -(halfH + 10), (halfW + 10), (halfH + 10), borderPaint)
         }
       }
     }
@@ -127,7 +127,7 @@ class EditorRenderer {
       val t = layer.transform
       translate(t.x * scaleX, t.y * scaleY)
       rotate(t.rotation)
-      scale(t.scale * scaleX, t.scale * scaleY)
+      scale(scaleX, scaleY)
 
       drawText(layer.text, 0f, -bounds.top.toFloat(), paint)
 
@@ -140,7 +140,7 @@ class EditorRenderer {
               isAntiAlias = true
             }
 
-        drawRect(0f, 0f, layer.textWidthPx.toFloat(), layer.textHeightPx.toFloat(), borderPaint)
+        drawRect(0f, 0f, bounds.width().toFloat(), bounds.height().toFloat(), borderPaint)
       }
     }
   }
