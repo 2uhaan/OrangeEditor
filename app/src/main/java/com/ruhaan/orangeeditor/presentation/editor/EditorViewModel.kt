@@ -21,6 +21,7 @@ import com.ruhaan.orangeeditor.domain.model.layer.TextLayer
 import com.ruhaan.orangeeditor.domain.model.layer.Transform
 import com.ruhaan.orangeeditor.domain.repository.OrangeRepository
 import com.ruhaan.orangeeditor.util.BottomBarMode
+import com.ruhaan.orangeeditor.util.EditorRenderer
 import com.ruhaan.orangeeditor.util.Storage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -38,8 +39,11 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class EditorViewModel
 @Inject
-constructor(private val orangeRepository: OrangeRepository, private val storage: Storage) :
-    ViewModel() {
+constructor(
+    private val orangeRepository: OrangeRepository,
+    private val storage: Storage,
+    private val editorRenderer: EditorRenderer,
+) : ViewModel() {
 
   private val _editorState = MutableStateFlow(EditorState())
   val editorState = _editorState.asStateFlow()
@@ -112,7 +116,6 @@ constructor(private val orangeRepository: OrangeRepository, private val storage:
   fun addTextLayer(
       text: String,
       color: Color,
-      fontSizeInPx: Int,
       fontWeight: FontWeight,
       fontStyle: FontStyle,
       canvasWidthInPx: Float,
@@ -121,13 +124,21 @@ constructor(private val orangeRepository: OrangeRepository, private val storage:
     val x = canvasWidthInPx / 2f
     val y = canvasHeightInPx / 2f
 
+    val bitmapCreated =
+        editorRenderer.textLayerToBitmap(
+            text = text,
+            color = color,
+            fontWeight = fontWeight,
+            fontStyle = fontStyle,
+        )
+
     val layer =
         TextLayer(
             id = UUID.randomUUID().toString(),
             displayName = "Text ${nextTextId++}",
             text = text,
+            bitmap = bitmapCreated,
             color = color,
-            fontSizeInPx = fontSizeInPx,
             fontWeight = fontWeight,
             fontStyle = fontStyle,
             transform =
@@ -199,7 +210,6 @@ constructor(private val orangeRepository: OrangeRepository, private val storage:
 
   fun updateSelectedTextLayer(
       text: String,
-      fontSizeInPx: Int,
       fontColor: Color,
       fontWeight: FontWeight,
       fontStyle: FontStyle,
@@ -208,10 +218,12 @@ constructor(private val orangeRepository: OrangeRepository, private val storage:
 
     saveSnapshot()
 
+    val newBitmap = editorRenderer.textLayerToBitmap(text, fontColor, fontWeight, fontStyle)
+
     val updatedLayer =
         selectedTextLayer.copy(
             text = text,
-            fontSizeInPx = fontSizeInPx,
+            bitmap = newBitmap,
             color = fontColor,
             fontWeight = fontWeight,
             fontStyle = fontStyle,

@@ -13,8 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -44,13 +42,11 @@ fun AddTextSheet(
     prevInputText: String,
     prevFontWeight: FontWeight,
     prevFontStyle: FontStyle,
-    prevFontSize: Int,
     prevColor: Color,
     onTextAdd:
         (
             isNewText: Boolean,
             text: String,
-            fontSizeInPx: Int,
             fontColor: Color,
             fontWeight: FontWeight,
             fontStyle: FontStyle,
@@ -78,23 +74,11 @@ fun AddTextSheet(
   var selectedColor by remember { mutableStateOf(prevColor) }
   var selectedFontWeight by remember { mutableStateOf(prevSelectedFontWeight) }
   var selectedFontStyle by remember { mutableStateOf(prevSelectedFontStyle) }
-  val sliderState = remember {
-    SliderState(value = prevFontSize.toFloat(), valueRange = 10f..300f, steps = 0)
-  }
 
   // Other
   val isValidInput by remember { derivedStateOf { inputText.isNotBlank() } }
   var isInteractedWithTextField by remember { mutableStateOf(false) }
   val shape = RoundedCornerShape(8.dp)
-
-  fun reset() {
-    isNewText = true
-    inputText = ""
-    selectedColor = Color.Black
-    selectedFontWeight = fontWeightOptions[0]
-    selectedFontStyle = fontStyleOptions[0]
-    sliderState.value = 80f
-  }
 
   // UI
   ModalBottomSheet(modifier = modifier, onDismissRequest = onDismissRequest) {
@@ -122,7 +106,6 @@ fun AddTextSheet(
                 onTextAdd(
                     isNewText,
                     inputText,
-                    sliderState.value.toInt(),
                     selectedColor,
                     selectedFontWeight.first,
                     selectedFontStyle.first,
@@ -198,28 +181,6 @@ fun AddTextSheet(
         }
       }
       Spacer(modifier = modifier.width(width = 4.dp))
-
-      // Font size
-      Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            text = "Font size",
-            modifier = Modifier.weight(1f),
-            style = Typography.titleMedium,
-        )
-        Text(
-            text = "${sliderState.value.toInt()}",
-            style = Typography.labelLarge,
-        )
-      }
-      Slider(sliderState)
-      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(text = "${sliderState.valueRange.start.toInt()}px", style = Typography.labelMedium)
-        Text(
-            text = "${sliderState.valueRange.endInclusive.toInt()}px",
-            style = Typography.labelMedium,
-        )
-      }
-      Spacer(modifier = modifier.height(4.dp))
 
       // Font color
       Text(text = "Font color", modifier = Modifier.fillMaxWidth(), style = Typography.titleMedium)
