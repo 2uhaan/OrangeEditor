@@ -102,7 +102,6 @@ fun EditorCanvas(
               renderer.draw(
                   it.nativeCanvas,
                   state.layers,
-                  onTextMeasured = onUpdateLayer,
                   selectedLayerId = state.selectedLayerId,
               )
             }

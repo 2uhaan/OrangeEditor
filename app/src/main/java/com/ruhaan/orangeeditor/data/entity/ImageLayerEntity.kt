@@ -26,7 +26,6 @@ data class ImageLayerEntity(
     @Embedded val base: LayerBase,
     @Embedded val adjustment: Adjustment,
     val editorId: String,
-    val bitmapStoredPath: String,
     val imageFilter: ImageFilter,
     val originalWidth: Int,
     val originalHeight: Int,

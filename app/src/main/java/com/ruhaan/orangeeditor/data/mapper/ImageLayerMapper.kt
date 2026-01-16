@@ -23,13 +23,12 @@ fun ImageLayerEntity.toDomain(bitmap: Bitmap?): ImageLayer {
 fun ImageLayer.toEntity(editorId: String, bitmapPath: String): ImageLayerEntity {
   return ImageLayerEntity(
       id = id,
-      base = LayerBase(transform, zIndex, visible),
+      base = LayerBase(transform, zIndex, visible, bitmapPath),
       adjustment = adjustment,
       editorId = editorId,
-      bitmapStoredPath = bitmapPath,
       imageFilter = imageFilter,
       originalWidth = originalWidth,
       originalHeight = originalHeight,
-      displayName = displayName,  // ← Add this
+      displayName = displayName,
   )
 }

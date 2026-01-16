@@ -114,13 +114,11 @@ fun EditorScreen(
           prevInputText = currentSelectedTextLayer?.text ?: "",
           prevFontWeight = currentSelectedTextLayer?.fontWeight ?: FontWeight.Normal,
           prevFontStyle = currentSelectedTextLayer?.fontStyle ?: FontStyle.Normal,
-          prevFontSize = currentSelectedTextLayer?.fontSizeInPx ?: 80,
           prevColor = currentSelectedTextLayer?.color ?: Color.Black,
-          onTextAdd = { isNewText, text, fontSize, fontColor, fontWeight, fontStyle ->
+          onTextAdd = { isNewText, text, fontColor, fontWeight, fontStyle ->
             if (isNewText || currentSelectedTextLayer == null) {
               viewModel.addTextLayer(
                   text = text,
-                  fontSizeInPx = fontSize,
                   color = fontColor,
                   fontWeight = fontWeight,
                   fontStyle = fontStyle,
@@ -130,7 +128,6 @@ fun EditorScreen(
             } else {
               viewModel.updateSelectedTextLayer(
                   text = text,
-                  fontSizeInPx = fontSize,
                   fontColor = fontColor,
                   fontWeight = fontWeight,
                   fontStyle = fontStyle,

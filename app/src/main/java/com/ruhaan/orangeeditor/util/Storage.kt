@@ -21,23 +21,41 @@ import kotlinx.coroutines.withContext
 
 class Storage(private val context: Context, private val editorRenderer: EditorRenderer) {
   suspend fun saveBitmapToAppStorage(
-      bitmap: Bitmap,
-      storageType: StorageType,
-      fileName: String = "img_${System.currentTimeMillis()}.jpg",
-      format: Bitmap.CompressFormat = Bitmap.CompressFormat.JPEG,
-      quality: Int = 80,
+    bitmap: Bitmap,
+    storageType: StorageType,
+    fileName: String? = null,
+    quality: Int = 80,
   ): String? =
-      withContext(Dispatchers.IO) {
-        try {
-          val dir = File(context.filesDir, storageType.folderName).apply { if (!exists()) mkdirs() }
-          val file = File(dir, fileName)
-          FileOutputStream(file).use { out -> bitmap.compress(format, quality, out) }
-          file.absolutePath
-        } catch (e: Exception) {
-          e.printStackTrace()
-          null
+    withContext(Dispatchers.IO) {
+      try {
+        val (format, extension) =
+          if (storageType == StorageType.TEXT_DIR) {
+            Bitmap.CompressFormat.PNG to ".png"
+          } else {
+            Bitmap.CompressFormat.JPEG to ".jpg"
+          }
+
+        val finalFileName =
+          fileName ?: "img_${System.currentTimeMillis()}$extension"
+
+        val dir =
+          File(context.filesDir, storageType.folderName).apply {
+            if (!exists()) mkdirs()
+          }
+
+        val file = File(dir, finalFileName)
+
+        FileOutputStream(file).use { out ->
+          bitmap.compress(format, quality, out)
         }
+
+        file.absolutePath
+      } catch (e: Exception) {
+        e.printStackTrace()
+        null
       }
+    }
+
 
   suspend fun loadBitmapFromPath(path: String): Bitmap? =
       withContext(Dispatchers.IO) { BitmapFactory.decodeFile(path) }
@@ -69,7 +87,7 @@ class Storage(private val context: Context, private val editorRenderer: EditorRe
       val scaleY = canvasFormat.height.toFloat() / canvasScreenSize.height
 
       canvas.save()
-      editorRenderer.draw(canvas, layers, scaleX, scaleY){}
+      editorRenderer.draw(canvas, layers, scaleX, scaleY)
 
       return exportBitmap
     } catch (e: Exception) {
