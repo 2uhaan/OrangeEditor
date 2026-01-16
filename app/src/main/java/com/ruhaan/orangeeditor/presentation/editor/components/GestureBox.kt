@@ -40,15 +40,17 @@ fun GestureBox(
         derivedStateOf {
           when (val layer = currentLayer) {
             is TextLayer -> {
-              val w = layer.textWidthPx * layer.transform.scale
-              val h = layer.textHeightPx * layer.transform.scale
+              val w = layer.textWidthPx.toFloat()
+              val h = layer.textHeightPx.toFloat()
+
               LayerBounds(
-                  centerX = layer.transform.x,
-                  centerY = layer.transform.y,
-                  width = w,
-                  height = h,
+                centerX = layer.transform.x + w / 2f,
+                centerY = layer.transform.y + h / 2f,
+                width = w,
+                height = h,
               )
             }
+
             is ImageLayer -> {
               val bitmap = layer.bitmap ?: return@derivedStateOf null
               val w = bitmap.width * layer.transform.scale
