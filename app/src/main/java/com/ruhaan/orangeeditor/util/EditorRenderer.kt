@@ -127,7 +127,7 @@ class EditorRenderer {
       val t = layer.transform
       translate(t.x * scaleX, t.y * scaleY)
       rotate(t.rotation)
-      scale(t.scale * scaleX, t.scale * scaleY)
+      scale(scaleX, scaleY)
 
       drawText(layer.text, 0f, -bounds.top.toFloat(), paint)
 
