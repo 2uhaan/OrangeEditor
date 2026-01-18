@@ -68,10 +68,9 @@ fun GestureBox(
                               tapX = offset.x,
                               tapY = offset.y,
                           )
-                      tappedLayer?.let {
-                        onLayerTapped(it.id)
-                        if (tappedLayer is TextLayer) onTextLayerEdit(tappedLayer) else onTapped()
-                      } ?: onTapped()
+
+                      if (tappedLayer != null) onLayerTapped(tappedLayer.id)
+                      onTapped()
                     },
                     onDoubleTap = { offset ->
                       val tappedLayer =
@@ -80,12 +79,20 @@ fun GestureBox(
                               tapX = offset.x,
                               tapY = offset.y,
                           )
-                      tappedLayer?.let {
-                        onLayerTapped(it.id)
-                        if (tappedLayer is TextLayer) {
+
+                      when (tappedLayer) {
+                        null -> onDoubleTap()
+
+                        is TextLayer -> {
                           onTextLayerEdit(tappedLayer)
-                        } else onDoubleTap()
-                      } ?: onDoubleTap()
+                          onLayerTapped(tappedLayer.id)
+                        }
+
+                        else -> {
+                          onDoubleTap()
+                          onLayerTapped(tappedLayer.id)
+                        }
+                      }
                     },
                 )
               }
