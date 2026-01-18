@@ -252,10 +252,9 @@ fun EditorScreen(
           )
         }
       },
-  ) { innerPadding ->
+  ) { _ ->
     Box(
-        modifier =
-            modifier.fillMaxSize().padding(innerPadding).background(color = Color(0xFFfaf9f6)),
+        modifier = modifier.fillMaxSize().background(color = Color(0xFFfaf9f6)),
         contentAlignment = Alignment.Center,
     ) {
       EditorCanvas(
@@ -266,6 +265,7 @@ fun EditorScreen(
             viewModel.updateCanvasSize(size = size)
           },
           onUpdateLayer = viewModel::updateLayer,
+          onUpdateSelectedTextLayer = viewModel::updateSelectedTextLayer,
           onLayerTapped = viewModel::selectedLayer,
       )
       if (loadingImage) {
