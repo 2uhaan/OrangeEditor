@@ -19,15 +19,18 @@ import com.ruhaan.orangeeditor.util.snapToGuides
 
 @Composable
 fun GestureBox(
-  width: Dp,
-  height: Dp,
-  state: EditorState,
-  onLayerTapped: (String) -> Unit,
-  onUpdateLayer: (Layer) -> Unit,
-  onDragStateChange: (Boolean) -> Unit,
-  onLayerBoundsChange: (LayerBounds?) -> Unit,
-  canvasWidthPx: Float,
-  canvasHeightPx: Float,
+    width: Dp,
+    height: Dp,
+    canvasWidthPx: Float,
+    canvasHeightPx: Float,
+    state: EditorState,
+    onUpdateLayer: (Layer) -> Unit,
+    onTapped: () -> Unit,
+    onTextLayerEdit: (TextLayer) -> Unit,
+    onDoubleTap: () -> Unit,
+    onLayerTapped: (String) -> Unit,
+    onDragStateChange: (Boolean) -> Unit,
+    onLayerBoundsChange: (LayerBounds?) -> Unit,
 ) {
   val selectedLayerId = state.selectedLayerId
   val selectedLayer = state.layers.firstOrNull { it.id == selectedLayerId } ?: return
@@ -36,95 +39,121 @@ fun GestureBox(
 
   // Calculate layer bounds (in px) from currentLayer
   val layerBounds by
-  remember(currentLayer) {
-    derivedStateOf {
-      val bitmap = currentLayer.bitmap ?: return@derivedStateOf null
-      val w = bitmap.width * currentLayer.transform.scale
-      val h = bitmap.height * currentLayer.transform.scale
-      LayerBounds(
-        centerX = currentLayer.transform.x,
-        centerY = currentLayer.transform.y,
-        width = w,
-        height = h,
-      )
-    }
-  }
+      remember(currentLayer) {
+        derivedStateOf {
+          val bitmap = currentLayer.bitmap ?: return@derivedStateOf null
+          val w = bitmap.width * currentLayer.transform.scale
+          val h = bitmap.height * currentLayer.transform.scale
+          LayerBounds(
+              centerX = currentLayer.transform.x,
+              centerY = currentLayer.transform.y,
+              width = w,
+              height = h,
+          )
+        }
+      }
 
   // Notify parent about bounds
   LaunchedEffect(layerBounds) { onLayerBoundsChange(layerBounds) }
 
   Box(
-    modifier =
-      Modifier.size(width, height)
-        .pointerInput(state.layers) {
-          detectTapGestures { offset ->
-            val tappedText =
-              detectTappedLayer(
-                layers = state.layers,
-                tapX = offset.x,
-                tapY = offset.y,
-              )
-            tappedText?.let { onLayerTapped(it.id) }
-          }
-        }
-        .pointerInput(Unit) {
-          detectTransformGesturesWithEnd(
-            onGestureStart = { onDragStateChange(true) },
-            onGesture = { _, pan, zoom, rotation ->
-              val newX = currentLayer.transform.x + pan.x
-              val newY = currentLayer.transform.y + pan.y
-              val newScale = (currentLayer.transform.scale * zoom).coerceIn(0.1f, 2f)
+      modifier =
+          Modifier.size(width, height)
+              .pointerInput(state.layers) {
+                detectTapGestures(
+                    onTap = { offset ->
+                      val tappedLayer =
+                          detectTappedLayer(
+                              layers = state.layers,
+                              tapX = offset.x,
+                              tapY = offset.y,
+                          )
 
-              val snapX =
-                snapToGuides(
-                  value = newX,
-                  canvasWidth = canvasWidthPx,
-                  canvasHeight = canvasHeightPx,
-                  layerWidth = layerBounds?.width ?: 0f,
-                  layerHeight = layerBounds?.height ?: 0f,
-                  threshold = AlignmentConstants.ALIGNMENT_THRESHOLD_PX,
+                      if (tappedLayer != null) onLayerTapped(tappedLayer.id)
+                      onTapped()
+                    },
+                    onDoubleTap = { offset ->
+                      val tappedLayer =
+                          detectTappedLayer(
+                              layers = state.layers,
+                              tapX = offset.x,
+                              tapY = offset.y,
+                          )
+
+                      when (tappedLayer) {
+                        null -> onDoubleTap()
+
+                        is TextLayer -> {
+                          onTextLayerEdit(tappedLayer)
+                          onLayerTapped(tappedLayer.id)
+                        }
+
+                        else -> {
+                          onDoubleTap()
+                          onLayerTapped(tappedLayer.id)
+                        }
+                      }
+                    },
                 )
-              val snapY =
-                snapToGuides(
-                  value = newY,
-                  canvasWidth = canvasWidthPx,
-                  canvasHeight = canvasHeightPx,
-                  layerWidth = layerBounds?.width ?: 0f,
-                  layerHeight = layerBounds?.height ?: 0f,
-                  threshold = AlignmentConstants.ALIGNMENT_THRESHOLD_PX,
+              }
+              .pointerInput(Unit) {
+                detectTransformGesturesWithEnd(
+                    onGestureStart = { onDragStateChange(true) },
+                    onGesture = { _, pan, zoom, rotation ->
+                      val newX = currentLayer.transform.x + pan.x
+                      val newY = currentLayer.transform.y + pan.y
+                      val newScale = (currentLayer.transform.scale * zoom).coerceIn(0.1f, 2f)
+
+                      val snapX =
+                          snapToGuides(
+                              value = newX,
+                              canvasWidth = canvasWidthPx,
+                              canvasHeight = canvasHeightPx,
+                              layerWidth = layerBounds?.width ?: 0f,
+                              layerHeight = layerBounds?.height ?: 0f,
+                              threshold = AlignmentConstants.ALIGNMENT_THRESHOLD_PX,
+                          )
+                      val snapY =
+                          snapToGuides(
+                              value = newY,
+                              canvasWidth = canvasWidthPx,
+                              canvasHeight = canvasHeightPx,
+                              layerWidth = layerBounds?.width ?: 0f,
+                              layerHeight = layerBounds?.height ?: 0f,
+                              threshold = AlignmentConstants.ALIGNMENT_THRESHOLD_PX,
+                          )
+
+                      val newTransform =
+                          Transform(
+                              x = snapX,
+                              y = snapY,
+                              scale = newScale,
+                              rotation = currentLayer.transform.rotation + rotation,
+                          )
+
+                      val updated =
+                          when (val layer = currentLayer) {
+                            is ImageLayer -> layer.copy(transform = newTransform)
+                            is TextLayer -> layer.copy(transform = newTransform)
+                          }
+
+                      onUpdateLayer(updated)
+                    },
+                    onGestureEnd = {
+                      onDragStateChange(false) // NOW THIS GETS CALLED
+                    },
                 )
-
-              val newTransform =
-                Transform(
-                  x = snapX,
-                  y = snapY,
-                  scale = newScale,
-                  rotation = currentLayer.transform.rotation + rotation,
-                )
-
-              val updated =
-                when (val layer = currentLayer) {
-                  is ImageLayer -> layer.copy(transform = newTransform)
-                  is TextLayer -> layer.copy(transform = newTransform)
-                }
-
-              onUpdateLayer(updated)
-            },
-            onGestureEnd = {
-              onDragStateChange(false) // NOW THIS GETS CALLED
-            },
-          )
-        }
+              }
   )
 }
 
 fun detectTappedLayer(
-  layers: List<Layer>,
-  tapX: Float,
-  tapY: Float,
+    layers: List<Layer>,
+    tapX: Float,
+    tapY: Float,
 ): Layer? =
-  layers
-    .asSequence()
-    .filter { it.visible }
-    .sortedByDescending { it.zIndex } // top-most first
-    .firstOrNull { layer -> layer.isIntersect(tapX = tapX, tapY = tapY) }
+    layers
+        .asSequence()
+        .filter { it.visible }
+        .sortedByDescending { it.zIndex } // top-most first
+        .firstOrNull { layer -> layer.isIntersect(tapX = tapX, tapY = tapY) }

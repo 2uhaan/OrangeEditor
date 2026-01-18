@@ -91,7 +91,7 @@ class EditorRenderer {
           val borderPaint =
               Paint().apply {
                 style = Paint.Style.STROKE
-                strokeWidth = 8f
+                strokeWidth = 10f / t.scale
                 color = CanvasOrange.toArgb()
                 isAntiAlias = true
               }
@@ -132,7 +132,7 @@ class EditorRenderer {
     val paint =
         Paint(Paint.ANTI_ALIAS_FLAG).apply {
           this.color = color.toArgb()
-          textSize = 80.toFloat()
+          textSize = 120.toFloat()
           typeface = resolveTypeface(fontWeight, fontStyle)
           textAlign = Paint.Align.LEFT
         }

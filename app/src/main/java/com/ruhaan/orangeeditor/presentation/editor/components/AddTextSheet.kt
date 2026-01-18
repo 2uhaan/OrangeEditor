@@ -39,13 +39,8 @@ fun AddTextSheet(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit,
     isNew: Boolean,
-    prevInputText: String,
-    prevFontWeight: FontWeight,
-    prevFontStyle: FontStyle,
-    prevColor: Color,
     onTextAdd:
         (
-            isNewText: Boolean,
             text: String,
             fontColor: Color,
             fontWeight: FontWeight,
@@ -53,27 +48,15 @@ fun AddTextSheet(
         ) -> Unit,
 ) {
 
-  val prevSelectedFontWeight =
-      when (prevFontWeight) {
-        FontWeight.Normal -> FontWeight.Normal to "Normal"
-        else -> FontWeight.Bold to "Bold"
-      }
-
-  val prevSelectedFontStyle =
-      when (prevFontStyle) {
-        FontStyle.Normal -> FontStyle.Normal to "Normal"
-        else -> FontStyle.Italic to "Italic"
-      }
-
   val fontWeightOptions = listOf(FontWeight.Normal to "Normal", FontWeight.Bold to "Bold")
   val fontStyleOptions = listOf(FontStyle.Normal to "Normal", FontStyle.Italic to "Italic")
 
   // States
   var isNewText by remember { mutableStateOf(isNew) }
-  var inputText by remember { mutableStateOf(prevInputText) }
-  var selectedColor by remember { mutableStateOf(prevColor) }
-  var selectedFontWeight by remember { mutableStateOf(prevSelectedFontWeight) }
-  var selectedFontStyle by remember { mutableStateOf(prevSelectedFontStyle) }
+  var inputText by remember { mutableStateOf("") }
+  var selectedColor by remember { mutableStateOf(Color.Black) }
+  var selectedFontWeight by remember { mutableStateOf(FontWeight.Normal) }
+  var selectedFontStyle by remember { mutableStateOf(FontStyle.Normal) }
 
   // Other
   val isValidInput by remember { derivedStateOf { inputText.isNotBlank() } }
@@ -104,11 +87,10 @@ fun AddTextSheet(
           Button(
               onClick = {
                 onTextAdd(
-                    isNewText,
                     inputText,
                     selectedColor,
-                    selectedFontWeight.first,
-                    selectedFontStyle.first,
+                    selectedFontWeight,
+                    selectedFontStyle,
                 )
                 onDismissRequest()
               },
@@ -153,7 +135,7 @@ fun AddTextSheet(
               text = fontWeight.second,
               style = Typography.bodyMedium.copy(fontWeight = fontWeight.first),
           ) {
-            selectedFontWeight = fontWeight
+            selectedFontWeight = fontWeight.first
           }
           Spacer(modifier = modifier.width(width = 4.dp))
         }
@@ -168,14 +150,14 @@ fun AddTextSheet(
               modifier =
                   Modifier.clip(shape)
                       .then(
-                          if (selectedFontStyle == fontStyle)
+                          if (selectedFontStyle == fontStyle.first)
                               Modifier.border(2.dp, CanvasOrange, shape)
                           else Modifier
                       ),
               text = fontStyle.second,
               style = Typography.bodyMedium.copy(fontStyle = fontStyle.first),
           ) {
-            selectedFontStyle = fontStyle
+            selectedFontStyle = fontStyle.first
           }
           Spacer(modifier = modifier.width(width = 4.dp))
         }
