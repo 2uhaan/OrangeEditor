@@ -30,7 +30,6 @@ fun EditorBottomBar(
     mode: BottomBarMode,
     onImageImportClick: (Bitmap) -> Unit,
     onAddTextClick: () -> Unit,
-    onEditTextClick: () -> Unit,
     onFilterClick: () -> Unit,
     onAdjustmentsClick: () -> Unit,
     onCropClick: () -> Unit,
@@ -81,19 +80,6 @@ fun EditorBottomBar(
           label = "Add Text",
       ) {
         onAddTextClick()
-      }
-    }
-
-    if (mode == BottomBarMode.TextLayerSelected) {
-      item {
-        LargeIconButton(
-            modifier = Modifier.widthIn(min = 80.dp),
-            iconId = R.drawable.ic_edit_text,
-            contentDescription = "Edit text",
-            label = "Edit Text",
-        ) {
-          onEditTextClick()
-        }
       }
     }
 
@@ -159,44 +145,40 @@ fun EditorBottomBar(
 }
 
 suspend fun loadBitmapFromUri(
-  context: Context,
-  uri: Uri,
-  onImageLoading: (Boolean) -> Unit,
+    context: Context,
+    uri: Uri,
+    onImageLoading: (Boolean) -> Unit,
 ): Bitmap? =
-  withContext(Dispatchers.IO) {
-    onImageLoading(true)
-    try {
-      val source = ImageDecoder.createSource(context.contentResolver, uri)
+    withContext(Dispatchers.IO) {
+      onImageLoading(true)
+      try {
+        val source = ImageDecoder.createSource(context.contentResolver, uri)
 
-      ImageDecoder.decodeBitmap(source) { decoder, info, _ ->
-        decoder.isMutableRequired = true
-        decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+        ImageDecoder.decodeBitmap(source) { decoder, info, _ ->
+          decoder.isMutableRequired = true
+          decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
 
-        val srcWidth = info.size.width
-        val srcHeight = info.size.height
+          val srcWidth = info.size.width
+          val srcHeight = info.size.height
 
-        // ---- HARD LIMIT (no upscaling) ----
-        val scale =
-          minOf(
-            MAX_DIMENSION.toFloat() / srcWidth,
-            MAX_DIMENSION.toFloat() / srcHeight,
-            1f
-          )
+          // ---- HARD LIMIT (no upscaling) ----
+          val scale =
+              minOf(MAX_DIMENSION.toFloat() / srcWidth, MAX_DIMENSION.toFloat() / srcHeight, 1f)
 
-        val targetWidth = (srcWidth * scale).toInt()
-        val targetHeight = (srcHeight * scale).toInt()
+          val targetWidth = (srcWidth * scale).toInt()
+          val targetHeight = (srcHeight * scale).toInt()
 
-        if (targetWidth != srcWidth || targetHeight != srcHeight) {
-          decoder.setTargetSize(targetWidth, targetHeight)
+          if (targetWidth != srcWidth || targetHeight != srcHeight) {
+            decoder.setTargetSize(targetWidth, targetHeight)
+          }
         }
+      } catch (e: Exception) {
+        e.printStackTrace()
+        null
+      } finally {
+        onImageLoading(false)
       }
-    } catch (e: Exception) {
-      e.printStackTrace()
-      null
-    } finally {
-      onImageLoading(false)
     }
-  }
 
 /*
 

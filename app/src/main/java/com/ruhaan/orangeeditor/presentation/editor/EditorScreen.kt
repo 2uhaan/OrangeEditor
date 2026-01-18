@@ -30,8 +30,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -58,7 +56,6 @@ fun EditorScreen(
   // ViewModel states
   val editorState by viewModel.editorState.collectAsState()
   val canvasFormat by remember { derivedStateOf { editorState.canvasFormat } }
-  var currentSelectedTextLayer by remember { mutableStateOf(viewModel.getSelectedTextLayer()) }
   var currentSelectedImageLayer by remember { mutableStateOf(viewModel.getSelectedImagerLayer()) }
   val context = LocalContext.current
   val exportResult by viewModel.exportResult.collectAsState()
@@ -78,10 +75,7 @@ fun EditorScreen(
   val bottomBarMode by
       remember(editorState.selectedLayerId) { derivedStateOf { viewModel.getBottomBarMode() } }
 
-  LaunchedEffect(editorState) {
-    currentSelectedTextLayer = viewModel.getSelectedTextLayer()
-    currentSelectedImageLayer = viewModel.getSelectedImagerLayer()
-  }
+  LaunchedEffect(editorState) { currentSelectedImageLayer = viewModel.getSelectedImagerLayer() }
 
   LaunchedEffect(exportResult) {
     when (exportResult) {
@@ -111,28 +105,15 @@ fun EditorScreen(
       AddTextSheet(
           onDismissRequest = { showAddTextSheet = false },
           isNew = isAddingNewText,
-          prevInputText = currentSelectedTextLayer?.text ?: "",
-          prevFontWeight = currentSelectedTextLayer?.fontWeight ?: FontWeight.Normal,
-          prevFontStyle = currentSelectedTextLayer?.fontStyle ?: FontStyle.Normal,
-          prevColor = currentSelectedTextLayer?.color ?: Color.Black,
-          onTextAdd = { isNewText, text, fontColor, fontWeight, fontStyle ->
-            if (isNewText || currentSelectedTextLayer == null) {
-              viewModel.addTextLayer(
-                  text = text,
-                  color = fontColor,
-                  fontWeight = fontWeight,
-                  fontStyle = fontStyle,
-                  canvasWidthInPx = canvasSize.width.toFloat(),
-                  canvasHeightInPx = canvasSize.height.toFloat(),
-              )
-            } else {
-              viewModel.updateSelectedTextLayer(
-                  text = text,
-                  fontColor = fontColor,
-                  fontWeight = fontWeight,
-                  fontStyle = fontStyle,
-              )
-            }
+          onTextAdd = { text, fontColor, fontWeight, fontStyle ->
+            viewModel.addTextLayer(
+                text = text,
+                color = fontColor,
+                fontWeight = fontWeight,
+                fontStyle = fontStyle,
+                canvasWidthInPx = canvasSize.width.toFloat(),
+                canvasHeightInPx = canvasSize.height.toFloat(),
+            )
           },
       )
 
@@ -235,13 +216,6 @@ fun EditorScreen(
               onAddTextClick = {
                 isAddingNewText = true
                 showAddTextSheet = true
-              },
-              onEditTextClick = {
-                if (currentSelectedTextLayer != null) {
-                  isAddingNewText = false
-                  showAddTextSheet = true
-                }
-                // Else: (button disabled)
               },
               onFilterClick = { showImageFilters = !showImageFilters },
               onAdjustmentsClick = { showAdjustmentsSheet = true },
