@@ -322,7 +322,7 @@ fun EditorCanvas(
         ) {
           TextField(
               value = editingText,
-              onValueChange = { editingText = it },
+              onValueChange = { if(it.text.isNotBlank()) editingText = it },
               modifier =
                   Modifier.weight(1f)
                       .height(56.dp) // ✅ fixed height
