@@ -37,6 +37,7 @@ import com.ruhaan.orangeeditor.domain.model.layer.ExportResult
 import com.ruhaan.orangeeditor.domain.model.layer.NeutralAdjustment
 import com.ruhaan.orangeeditor.presentation.editor.components.AddTextSheet
 import com.ruhaan.orangeeditor.presentation.editor.components.AdjustmentsSheet
+import com.ruhaan.orangeeditor.presentation.editor.components.DottedContainer
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorBottomBar
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorCanvas
 import com.ruhaan.orangeeditor.presentation.editor.components.EditorTopBar
@@ -227,10 +228,9 @@ fun EditorScreen(
           )
         }
       },
-  ) { _ ->
-    Box(
-        modifier = modifier.fillMaxSize().background(color = Color(0xFFfaf9f6)),
-        contentAlignment = Alignment.Center,
+  ) { innerPadding ->
+    DottedContainer(
+        modifier = modifier.fillMaxSize().padding(8.dp).padding(innerPadding),
     ) {
       EditorCanvas(
           state = editorState,
