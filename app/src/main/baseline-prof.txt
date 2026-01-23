@@ -1,0 +1,106 @@
+# ===== App Startup - Hot Path =====
+# These classes are loaded immediately when the app starts
+Lcom/ruhaan/orangeeditor/MainActivity;
+Lcom/ruhaan/orangeeditor/OrangeApplication;
+
+# ===== Navigation =====
+# Pre-compile navigation for instant screen transitions
+Lcom/ruhaan/orangeeditor/presentation/navigation/NavGraphKt;
+Lcom/ruhaan/orangeeditor/presentation/navigation/Route;
+Lcom/ruhaan/orangeeditor/presentation/navigation/Route$Home;
+Lcom/ruhaan/orangeeditor/presentation/navigation/Route$Editor;
+Lcom/ruhaan/orangeeditor/presentation/navigation/Route$CropScreen;
+
+# ===== Dependency Injection (Hilt) =====
+# Hilt initialization happens early in app lifecycle
+Lcom/ruhaan/orangeeditor/di/Module;
+Lcom/ruhaan/orangeeditor/OrangeApplication_HiltComponents$SingletonC;
+Lcom/ruhaan/orangeeditor/OrangeApplication_HiltComponents;
+
+# ===== ViewModel =====
+# Critical for editor functionality - pre-compile for smooth editing
+Lcom/ruhaan/orangeeditor/presentation/editor/EditorViewModel;
+
+# ===== Main Screens =====
+# Pre-compile all three main screens for instant navigation
+Lcom/ruhaan/orangeeditor/presentation/home/HomeScreenKt;
+Lcom/ruhaan/orangeeditor/presentation/editor/EditorScreenKt;
+Lcom/ruhaan/orangeeditor/presentation/crop/CropScreenKt;
+
+# ===== Editor Components - High Usage =====
+# These components are used frequently in the editor
+Lcom/ruhaan/orangeeditor/presentation/editor/components/EditorCanvasKt;
+Lcom/ruhaan/orangeeditor/presentation/editor/components/EditorBottomBarKt;
+Lcom/ruhaan/orangeeditor/presentation/editor/components/EditorTopBarKt;
+Lcom/ruhaan/orangeeditor/presentation/editor/components/GestureBoxKt;
+
+# ===== Domain Models - Core Logic =====
+# Frequently accessed data models
+Lcom/ruhaan/orangeeditor/domain/model/layer/EditorState;
+Lcom/ruhaan/orangeeditor/domain/model/layer/ImageLayer;
+Lcom/ruhaan/orangeeditor/domain/model/layer/TextLayer;
+Lcom/ruhaan/orangeeditor/domain/model/layer/Layer;
+Lcom/ruhaan/orangeeditor/domain/model/format/CanvasFormat;
+
+# ===== Repository & Database =====
+# Data access layer - frequently used
+Lcom/ruhaan/orangeeditor/data/repository/OrangeRepositoryImpl;
+Lcom/ruhaan/orangeeditor/data/database/OrangeDatabase;
+Lcom/ruhaan/orangeeditor/domain/repository/OrangeRepository;
+
+# ===== Room DAOs =====
+# Database operations - pre-compile for faster queries
+Lcom/ruhaan/orangeeditor/data/dao/EditorStateDao;
+Lcom/ruhaan/orangeeditor/data/dao/ImageLayerDao;
+Lcom/ruhaan/orangeeditor/data/dao/TextLayerDao;
+
+# ===== Utilities =====
+# Frequently used utilities
+Lcom/ruhaan/orangeeditor/util/EditorRenderer;
+Lcom/ruhaan/orangeeditor/util/Storage;
+
+# ===== Jetpack Compose Runtime =====
+# Core Compose classes for UI rendering
+Landroidx/compose/runtime/ComposerKt;
+Landroidx/compose/runtime/Recomposer;
+Landroidx/compose/runtime/CompositionLocalKt;
+Landroidx/compose/ui/platform/AndroidCompositionLocals_androidKt;
+Landroidx/compose/ui/platform/CompositionLocalsKt;
+
+# ===== Material3 =====
+# UI components used throughout the app
+Landroidx/compose/material3/SurfaceKt;
+Landroidx/compose/material3/ScaffoldKt;
+Landroidx/compose/material3/TextKt;
+Landroidx/compose/material3/ButtonKt;
+Landroidx/compose/material3/IconButtonKt;
+
+# ===== Navigation Compose =====
+# Navigation framework
+Landroidx/navigation/compose/NavHostKt;
+Landroidx/navigation/NavController;
+Landroidx/navigation/NavGraphBuilder;
+
+# ===== Activity Compose =====
+# Activity integration with Compose
+Landroidx/activity/compose/ComponentActivityKt;
+
+# ===== Lifecycle =====
+# ViewModel and lifecycle management
+Landroidx/lifecycle/ViewModelProvider;
+Landroidx/lifecycle/ViewModel;
+Landroidx/lifecycle/viewmodel/compose/ViewModelKt;
+
+# ===== Hilt ViewModel =====
+# Hilt integration for ViewModels
+Landroidx/hilt/navigation/compose/HiltViewModelKt;
+
+# ===== Room Runtime =====
+# Database runtime
+Landroidx/room/RoomDatabase;
+Landroidx/room/Room;
+
+# ===== Coil (Image Loading) =====
+# Image loading library - used for previews
+Lcoil3/compose/AsyncImageKt;
+Lcoil3/ImageLoader;

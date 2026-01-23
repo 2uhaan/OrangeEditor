@@ -20,6 +20,8 @@ android {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
+  sourceSets { getByName("main") { assets.srcDirs("src/main") } }
+
   buildTypes {
     debug {
       isMinifyEnabled = true
@@ -47,6 +49,8 @@ android {
 
 //noinspection UseTomlInstead
 dependencies {
+  implementation("androidx.profileinstaller:profileinstaller:1.4.1")
+
   implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
   implementation("com.github.Tanish-Ranjan:crop-kit:1.1.0")
   implementation("com.github.KvColorPalette:KvColorPicker-Android:3.0.1")
